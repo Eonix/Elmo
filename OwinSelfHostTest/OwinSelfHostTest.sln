@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinSelfHostTest", "OwinSelfHostTest\OwinSelfHostTest.csproj", "{91BB359A-07D8-4160-9FCC-53686C476D10}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External Projects", "External Projects", "{70FCCCE9-3350-42C2-AECD-8870E3B6F483}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elmo", "..\Elmo\Elmo\Elmo.csproj", "{0EB400AD-267E-44D7-99EA-5AB07C4E3A22}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91BB359A-07D8-4160-9FCC-53686C476D10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91BB359A-07D8-4160-9FCC-53686C476D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91BB359A-07D8-4160-9FCC-53686C476D10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91BB359A-07D8-4160-9FCC-53686C476D10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EB400AD-267E-44D7-99EA-5AB07C4E3A22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EB400AD-267E-44D7-99EA-5AB07C4E3A22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EB400AD-267E-44D7-99EA-5AB07C4E3A22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EB400AD-267E-44D7-99EA-5AB07C4E3A22}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0EB400AD-267E-44D7-99EA-5AB07C4E3A22} = {70FCCCE9-3350-42C2-AECD-8870E3B6F483}
+	EndGlobalSection
+EndGlobal
