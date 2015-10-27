@@ -24,8 +24,6 @@ namespace Elmo.Responses
 
         public async Task ProcessRequestAsync()
         {
-            owinContext.Response.ContentType = "application/xml";
-
             var syndicationFeed = new SyndicationFeed();
 
             var hostName = EnvironmentUtilities.GetMachineNameOrDefault("Unknown Host");
@@ -34,57 +32,78 @@ namespace Elmo.Responses
             syndicationFeed.Language = "en";
 
             var baseUri = owinContext.Request.Uri;
-            syndicationFeed.Links.Add(new SyndicationLink(baseUri));
+            syndicationFeed.Links.Add(SyndicationLink.CreateAlternateLink(baseUri));
 
-            // 0. Find out the maximum errors to display.
-            // 1. Iterate through the errors.
-            // 2. Group errors by day.
-            // 3. Add an RSS item per day.
-            // 4. Add all errors for that day to the RSS item.
-            // 5. Max days (pages) to display is 30.
+            var logEntries = await GetAllEntriesAsync();
+            var groupBy = logEntries.GroupBy(
+                entry => new DateTime(entry.Error.Time.Year, entry.Error.Time.Month, entry.Error.Time.Day));
 
-            const int maxPageLimit = 30;
-            const int defaultPageSize = 30;
-
-
-
+            
             var itemList = new List<SyndicationItem>();
-            var pageIndex = 0;
-
-            var runningDay = DateTime.MaxValue;
-            var runningErrorCount = 0;
-            var errorEntriesCount = 0;
-
-            do
+            foreach (var grouping in groupBy)
             {
-                // Get a logical page of recent errors and loop through them.
-
-                var errorLogEntries = await errorLog.GetErrorsAsync(pageIndex++, defaultPageSize);
-                errorEntriesCount = errorLogEntries.Count;
-
-                foreach (var entry in errorLogEntries)
+                var syndicationItem = new SyndicationItem
                 {
-                    var error = entry.Error;
-                    var errorDay = new DateTime(error.Time.Year, error.Time.Month, error.Time.Day);
+                    Title =
+                        new TextSyndicationContent(
+                            $"Digest for {grouping.Key.ToString("yyyy-MM-dd")} ({grouping.Key.ToLongDateString()})"),
+                    PublishDate = grouping.Key,
+                    Id = grouping.Key.ToString("yyyy-MM-dd")
+                };
 
-                    var syndicationItem = new SyndicationItem();
-                    syndicationItem.Title = new TextSyndicationContent($"Digest for {errorDay.ToString("yyyy-MM-dd")} ({errorDay.ToLongDateString()})");
-                    syndicationItem.PublishDate = error.Time;
-                    syndicationItem.Content = new TextSyndicationContent(error.Message, TextSyndicationContentKind.Html);
+                var builder = new StringBuilder();
 
-                    itemList.Add(syndicationItem);
+                builder.AppendLine("<ul>");
+                foreach (var errorLogEntry in grouping)
+                {
+                    builder.AppendLine("<li>");
+                    builder.AppendLine($"{errorLogEntry.Error.TypeName}: <a href=\"{baseUri}/detail?id={errorLogEntry.Id}\">{errorLogEntry.Error.Message}</a>");
+                    builder.AppendLine("</li>");
                 }
+                builder.AppendLine("</ul>");
 
-            } while (pageIndex < maxPageLimit && itemList.Count < defaultPageSize && errorEntriesCount > 0);
+                syndicationItem.Content = SyndicationContent.CreateHtmlContent(builder.ToString());
+
+                itemList.Add(syndicationItem);
+            }
 
             syndicationFeed.Items = itemList;
 
+            owinContext.Response.ContentType = "application/xml";
             owinContext.Response.StatusCode = 200;
             owinContext.Response.ReasonPhrase = "Ok";
-            using (var writer = XmlWriter.Create(owinContext.Response.Body))
+
+            var xmlWriterSettings = new XmlWriterSettings
             {
-                new Rss20FeedFormatter(syndicationFeed).WriteTo(writer);
+                Indent = true,
+                IndentChars = "  ",
+                Encoding = Encoding.UTF8,
+                OmitXmlDeclaration = true
+            };
+
+            using (var writer = XmlWriter.Create(owinContext.Response.Body, xmlWriterSettings))
+            {
+                var formatter = new Rss20FeedFormatter(syndicationFeed);
+                formatter.WriteTo(writer);
             }
+        }
+
+        private async Task<IEnumerable<ErrorLogEntry>> GetAllEntriesAsync()
+        {
+            const int defaultPageSize = 30;
+            const int maxPageLimit = 30;
+            var totalErrorCount = await errorLog.GetTotalErrorCountAsync();
+
+            var count = 0;
+            var list = new List<ErrorLogEntry>();
+            for (var pageIndex = 0; pageIndex < maxPageLimit && count < totalErrorCount; pageIndex++)
+            {
+                var entries = await errorLog.GetErrorsAsync(pageIndex, defaultPageSize);
+                count += entries.Count;
+                list.AddRange(entries);
+            }
+
+            return list;
         }
     }
 }
