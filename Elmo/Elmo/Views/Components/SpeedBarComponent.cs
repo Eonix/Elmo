@@ -25,11 +25,11 @@ namespace Elmo.Views.Components
     {
         public static SpeedBarItem GetHome(string url) => new SpeedBarItem("Errors", "List of logged errors.", url);
 
-        public static SpeedBarItem GetRssFeed(string rootUrl) => new SpeedBarItem("RSS Feed", "RSS feed of recent errors.", $"{rootUrl}/rss");
+        public static SpeedBarItem GetRssFeed(string rootUrl) => new SpeedBarItem("RSS Feed", "RSS feed of recent errors.", $"{rootUrl}rss");
 
-        public static SpeedBarItem GetRssDigestFeed(string rootUrl) => new SpeedBarItem("RSS Digest", "RSS feed of errors within recent days.", $"{rootUrl}/digestrss");
+        public static SpeedBarItem GetRssDigestFeed(string rootUrl) => new SpeedBarItem("RSS Digest", "RSS feed of errors within recent days.", $"{rootUrl}digestrss");
 
-        public static SpeedBarItem GetDownloadLog(string rootUrl) => new SpeedBarItem("Download Log", "Download the entire log as CSV.", $"{rootUrl}/download");
+        public static SpeedBarItem GetDownloadLog(string rootUrl) => new SpeedBarItem("Download Log", "Download the entire log as CSV.", $"{rootUrl}download");
 
         //public static SpeedBarItem GetHelp() => new SpeedBarItem("Help", "Documentation, discussions, issues and more.", "#");
 

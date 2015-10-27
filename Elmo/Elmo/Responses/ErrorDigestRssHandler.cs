@@ -29,9 +29,10 @@ namespace Elmo.Responses
             var hostName = EnvironmentUtilities.GetMachineNameOrDefault("Unknown Host");
             syndicationFeed.Title = new TextSyndicationContent($"Daily digest of errors in {errorLog.ApplicationName} on {hostName}.");
             syndicationFeed.Description = new TextSyndicationContent("Daily digest of application errors");
-            syndicationFeed.Language = "en";
+            syndicationFeed.Language = "en-us";
 
-            var baseUri = owinContext.Request.Uri;
+            var uriAsString = owinContext.Request.Uri.ToString();
+            var baseUri = new Uri(uriAsString.Remove(uriAsString.LastIndexOf("/digestrss", StringComparison.InvariantCulture)));
             syndicationFeed.Links.Add(SyndicationLink.CreateAlternateLink(baseUri));
 
             var logEntries = await GetAllEntriesAsync();
@@ -69,7 +70,7 @@ namespace Elmo.Responses
 
             syndicationFeed.Items = itemList;
 
-            owinContext.Response.ContentType = "application/xml";
+            owinContext.Response.ContentType = "application/rss+xml";
             owinContext.Response.StatusCode = 200;
             owinContext.Response.ReasonPhrase = "Ok";
 

@@ -40,7 +40,11 @@ namespace Elmo
                 // TODO: Serve RemoteAccessError.html
             }
 
-            if (PathEquals(context, "digestrss"))
+            if (PathEquals(context, "rss"))
+            {
+                await new ErrorRssHandler(context, errorLog).ProcessRequestAsync();
+            }
+            else if (PathEquals(context, "digestrss"))
             {
                 await new ErrorDigestRssHandler(context, errorLog).ProcessRequestAsync();
             }
