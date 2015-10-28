@@ -69,6 +69,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Responses\ErrorDigestRssHandler.cs" />
+    <Compile Include="Responses\ErrorJsonHandler.cs" />
     <Compile Include="Responses\ErrorLogDownloadHandler.cs" />
     <Compile Include="Responses\ErrorRssHandler.cs" />
     <Compile Include="Utilities\EnvironmentUtilities.cs" />

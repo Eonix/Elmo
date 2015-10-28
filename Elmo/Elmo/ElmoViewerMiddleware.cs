@@ -31,7 +31,8 @@ namespace Elmo
                 return;
             }
 
-            if (!options.AllowRemoteAccess && !IsLocalIpAddress(context.Request.RemoteIpAddress))
+            
+            if (!options.AllowRemoteAccess && !IsLocalIpAddress(context))
             {
                 // TODO: Check if authorized.
                 context.Response.StatusCode = 403;
@@ -40,7 +41,11 @@ namespace Elmo
                 // TODO: Serve RemoteAccessError.html
             }
 
-            if (PathEquals(context, "rss"))
+            if (PathEquals(context, "json"))
+            {
+                await new ErrorJsonHandler(context, errorLog).ProcessRequestAsync();
+            }
+            else if (PathEquals(context, "rss"))
             {
                 await new ErrorRssHandler(context, errorLog).ProcessRequestAsync();
             }
@@ -55,9 +60,9 @@ namespace Elmo
             else if (PathEquals(context, "stylesheet"))
             {
                 // TODO: Return specific style sheets and javascript files.
-                context.Response.Write(Resources.ErrorLogStyle);
-                context.Response.ContentType = "text/css";
                 context.Response.StatusCode = 200;
+                context.Response.ContentType = "text/css";
+                context.Response.Write(Resources.ErrorLogStyle);
             }
             else
             {
@@ -67,9 +72,9 @@ namespace Elmo
             }
         }
 
-        private bool IsLocalIpAddress(string address)
+        private static bool IsLocalIpAddress(IOwinContext owinContext)
         {
-            return address == "::1" || address == "127.0.0.1";
+            return Convert.ToBoolean(owinContext.Environment["server.IsLocal"]);
         }
 
         private bool PathEquals(IOwinContext context, string segment)

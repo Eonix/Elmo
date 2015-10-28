@@ -76,7 +76,7 @@ namespace Elmo.Views
                 if (moreErrors)
                 {
                     await writer.WriteStartElementAsync(null, "a", null);
-                    await writer.WriteAttributeStringAsync(null, "href", null, $"{BasePageName}?={nextPageIndex + 1}&size={pageSize}");
+                    await writer.WriteAttributeStringAsync(null, "href", null, $"{BasePageName}?page={nextPageIndex + 1}&size={pageSize}");
                     await writer.WriteAttributeStringAsync(null, "rel", null, "next");
                     {
                         await writer.WriteStringAsync("Next errors");
@@ -92,7 +92,7 @@ namespace Elmo.Views
                         await writer.WriteRawAsync("; ");
 
                     await writer.WriteStartElementAsync(null, "a", null);
-                    await writer.WriteAttributeStringAsync(null, "href", null, $"{BasePageName}?=1&size={pageSize}");
+                    await writer.WriteAttributeStringAsync(null, "href", null, $"{BasePageName}?page=1&size={pageSize}");
                     await writer.WriteAttributeStringAsync(null, "rel", null, "start");
                     {
                         await writer.WriteStringAsync("Back to first page");
@@ -165,7 +165,7 @@ namespace Elmo.Views
                             await writer.WriteEndElementAsync();
 
                             await writer.WriteStartElementAsync(null, "a", null);
-                            await writer.WriteAttributeStringAsync(null, "href", null, $"{BasePageName}/detail?=id{errorLogEntry.Id}");
+                            await writer.WriteAttributeStringAsync(null, "href", null, $"{BasePageName}/detail?id={errorLogEntry.Id}");
                             {
                                 await writer.WriteRawAsync("Details&hellip;");
                             }

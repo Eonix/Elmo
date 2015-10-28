@@ -14,7 +14,7 @@ namespace Elmo.Views
 
         protected string PageTitle { get; set; }
         protected IErrorLog ErrorLog { get; set; }
-        protected string BasePageName => OwinContext.Request.Uri.ToString();
+        protected string BasePageName => OwinContext.Request.Path.Value.TrimEnd('/');
         protected string ApplicationName => ErrorLog.ApplicationName;
 
         protected ErrorViewBase(IOwinContext owinContext, IErrorLog errorLog)
