@@ -18,10 +18,11 @@ namespace Elmo.Logging
         public string User { get; }
         public DateTimeOffset Time { get; }
         public int StatusCode { get; }
-        public IDictionary<string, string> ServerVariables { get; }
+        public Dictionary<string, string> ServerEnvironment { get; }
+        public Dictionary<string, string[]> RequestHeaders { get; }
         public Dictionary<string, string[]> Query { get; }
         public Dictionary<string, string> Cookies { get; }
-
+        
         public Error(Exception exception, IOwinContext owinContext)
         {
             this.Exception = exception;
@@ -48,9 +49,8 @@ namespace Elmo.Logging
                 User = webUser.Identity.Name;
             }
 
-            ServerVariables = owinContext.Environment.ToDictionary(pair => pair.Key, pair => pair.Value?.ToString() ?? string.Empty);
-
-            ServerVariables.Remove("owin.ResponseBody");
+            ServerEnvironment = owinContext.Environment.ToDictionary(pair => pair.Key, pair => pair.Value?.ToString() ?? string.Empty);
+            RequestHeaders = owinContext.Request.Headers.ToDictionary(pair => pair.Key, pair => pair.Value);
 
             // TODO: Figure out if AUTH_PASSWORD is included and mask it
             //if (_serverVariables != null)

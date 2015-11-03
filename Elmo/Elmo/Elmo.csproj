@@ -72,6 +72,7 @@
     <Compile Include="Responses\ErrorJsonHandler.cs" />
     <Compile Include="Responses\ErrorLogDownloadHandler.cs" />
     <Compile Include="Responses\ErrorRssHandler.cs" />
+    <Compile Include="Responses\ErrorXmlHandler.cs" />
     <Compile Include="Utilities\EnvironmentUtilities.cs" />
     <Compile Include="Utilities\HttpCodeParser.cs" />
     <Compile Include="Views\Components\SpeedBarComponent.cs" />

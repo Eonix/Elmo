@@ -31,44 +31,56 @@ namespace Elmo
                 return;
             }
 
-            
-            if (!options.AllowRemoteAccess && !IsLocalIpAddress(context))
-            {
-                // TODO: Check if authorized.
-                context.Response.StatusCode = 403;
-                context.Response.ReasonPhrase = "Forbidden";
-                return;
-                // TODO: Serve RemoteAccessError.html
-            }
 
-            if (PathEquals(context, "json"))
+            try
             {
-                await new ErrorJsonHandler(context, errorLog).ProcessRequestAsync();
+                if (!options.AllowRemoteAccess && !IsLocalIpAddress(context))
+                {
+                    // TODO: Check if authorized.
+                    context.Response.StatusCode = 403;
+                    context.Response.ReasonPhrase = "Forbidden";
+                    return;
+                    // TODO: Serve RemoteAccessError.html
+                }
+
+                if (PathEquals(context, "xml"))
+                {
+                    await new ErrorXmlHandler(context, errorLog).ProcessRequestAsync();
+                }
+                else if (PathEquals(context, "json"))
+                {
+                    await new ErrorJsonHandler(context, errorLog).ProcessRequestAsync();
+                }
+                else if (PathEquals(context, "rss"))
+                {
+                    await new ErrorRssHandler(context, errorLog).ProcessRequestAsync();
+                }
+                else if (PathEquals(context, "digestrss"))
+                {
+                    await new ErrorDigestRssHandler(context, errorLog).ProcessRequestAsync();
+                }
+                else if (PathEquals(context, "download"))
+                {
+                    await new ErrorLogDownloadHandler(context, errorLog).ProcessRequestAsync();
+                }
+                else if (PathEquals(context, "stylesheet"))
+                {
+                    // TODO: Return specific style sheets and javascript files.
+                    context.Response.StatusCode = 200;
+                    context.Response.ContentType = "text/css";
+                    context.Response.Write(Resources.ErrorLogStyle);
+                }
+                else
+                {
+                    // TODO: Not found if path doesn't exist.
+                    // TODO: Correct Encoding.
+                    await new ErrorLogView(context, errorLog).RenderAsync();
+                }
             }
-            else if (PathEquals(context, "rss"))
+            catch (Exception e)
             {
-                await new ErrorRssHandler(context, errorLog).ProcessRequestAsync();
-            }
-            else if (PathEquals(context, "digestrss"))
-            {
-                await new ErrorDigestRssHandler(context, errorLog).ProcessRequestAsync();
-            }
-            else if (PathEquals(context, "download"))
-            {
-                await new ErrorLogDownloadHandler(context, errorLog).ProcessRequestAsync();
-            }
-            else if (PathEquals(context, "stylesheet"))
-            {
-                // TODO: Return specific style sheets and javascript files.
-                context.Response.StatusCode = 200;
-                context.Response.ContentType = "text/css";
-                context.Response.Write(Resources.ErrorLogStyle);
-            }
-            else
-            {
-                // TODO: Not found if path doesn't exist.
-                // TODO: Correct Encoding.
-                await new ErrorLogView(context, errorLog).RenderAsync();
+                // TODO: Log this error to generic logger.
+                Console.WriteLine(e);
             }
         }
 
