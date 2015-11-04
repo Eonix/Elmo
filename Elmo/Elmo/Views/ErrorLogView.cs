@@ -25,7 +25,7 @@ namespace Elmo.Views
         {
         }
 
-        protected async override Task RenderContentsAsync(XmlWriter writer)
+        protected override async Task RenderContentsAsync(XmlWriter writer)
         {
             await RenderTitleAsync(writer);
 

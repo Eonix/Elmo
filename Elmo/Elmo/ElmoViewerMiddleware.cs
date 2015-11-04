@@ -43,11 +43,7 @@ namespace Elmo
                     // TODO: Serve RemoteAccessError.html
                 }
 
-                if (PathEquals(context, "xml"))
-                {
-                    await new ErrorXmlHandler(context, errorLog).ProcessRequestAsync();
-                }
-                else if (PathEquals(context, "json"))
+                if (PathEquals(context, "json"))
                 {
                     await new ErrorJsonHandler(context, errorLog).ProcessRequestAsync();
                 }

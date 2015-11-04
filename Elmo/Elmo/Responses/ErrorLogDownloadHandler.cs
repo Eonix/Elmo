@@ -38,7 +38,7 @@ namespace Elmo.Responses
 
             using (var writer = new StreamWriter(owinContext.Response.Body))
             {
-                await writer.WriteLineAsync("Application,Host,Time,Type,Source,User,Status Code,Message,URL,XMLREF,JSONREF");
+                await writer.WriteLineAsync("Application,Host,Time,Type,Source,User,Status Code,Message,URL,JSONREF");
 
                 do
                 {
@@ -51,7 +51,7 @@ namespace Elmo.Responses
                         var error = errorLogEntry.Error;
                         var time = error.Time.ToUniversalTime();
                         var query = $"?id={errorLogEntry.Id}";
-                        await writer.WriteLineAsync($"{error.ApplicationName},{error.HostName},{time.ToString("yyyy-MM-dd HH:mm:ss")},{error.TypeName},{error.Source},{error.User},{error.StatusCode},{error.Message},{new Uri(requestUrl, "detail" + query)},{new Uri(requestUrl, "xml" + query)},{new Uri(requestUrl, "json" + query)}");
+                        await writer.WriteLineAsync($"{error.ApplicationName},{error.HostName},{time.ToString("yyyy-MM-dd HH:mm:ss")},{error.TypeName},{error.Source},{error.User},{error.StatusCode},{error.Message},{new Uri(requestUrl, "detail" + query)},{new Uri(requestUrl, "json" + query)}");
                     }
                 } while (count < maxDownloadCount);
             }
