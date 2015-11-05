@@ -70,9 +70,10 @@
     </Compile>
     <Compile Include="Responses\ErrorDigestRssHandler.cs" />
     <Compile Include="Responses\ErrorJsonHandler.cs" />
+    <Compile Include="Responses\ErrorLogCssHandler.cs" />
     <Compile Include="Responses\ErrorLogDownloadHandler.cs" />
     <Compile Include="Responses\ErrorRssHandler.cs" />
-    <Compile Include="Responses\ErrorXmlHandler.cs" />
+    <Compile Include="Responses\IRequestHandler.cs" />
     <Compile Include="Utilities\EnvironmentUtilities.cs" />
     <Compile Include="Utilities\HttpCodeParser.cs" />
     <Compile Include="Views\Components\SpeedBarComponent.cs" />

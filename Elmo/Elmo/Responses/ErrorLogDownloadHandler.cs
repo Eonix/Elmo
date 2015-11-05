@@ -1,26 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Elmo.Logging;
 using Microsoft.Owin;
 
 namespace Elmo.Responses
 {
-    internal class ErrorLogDownloadHandler
+    internal class ErrorLogDownloadHandler : IRequestHandler
     {
-        private readonly IOwinContext owinContext;
-        private readonly IErrorLog errorLog;
-
-        public ErrorLogDownloadHandler(IOwinContext owinContext, IErrorLog errorLog)
-        {
-            this.owinContext = owinContext;
-            this.errorLog = errorLog;
-        }
-
-        public async Task ProcessRequestAsync()
+        public async Task ProcessRequestAsync(IOwinContext owinContext, IErrorLog errorLog)
         {
             const int defaultPageSize = 100;
             var pageIndex = 0;
@@ -55,6 +43,11 @@ namespace Elmo.Responses
                     }
                 } while (count < maxDownloadCount);
             }
+        }
+
+        public bool CanProcess(string path)
+        {
+            return path.StartsWith("/download");
         }
     }
 }

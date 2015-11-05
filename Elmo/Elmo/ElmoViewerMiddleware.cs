@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Elmo.Logging;
-using Elmo.Properties;
 using Elmo.Responses;
 using Elmo.Views;
 using Microsoft.Owin;
-using Newtonsoft.Json;
 
 namespace Elmo
 {
@@ -15,22 +13,32 @@ namespace Elmo
     {
         private readonly ElmoOptions options;
         private readonly IErrorLog errorLog;
+        private readonly List<IRequestHandler> handlers;
 
         public ElmoViewerMiddleware(OwinMiddleware next, ElmoOptions options, IErrorLog errorLog)
             : base(next)
         {
             this.options = options;
             this.errorLog = errorLog;
+
+            handlers = new List<IRequestHandler>
+            {
+                new ErrorJsonHandler(),
+                new ErrorRssHandler(),
+                new ErrorDigestRssHandler(),
+                new ErrorLogDownloadHandler(),
+                new ErrorLogCssHandler(),
+                new ErrorLogView()
+            };
         }
 
-        public async override Task Invoke(IOwinContext context)
+        public override async Task Invoke(IOwinContext context)
         {
             if (!options.Path.HasValue || !context.Request.Path.StartsWithSegments(options.Path))
             {
                 await Next.Invoke(context);
                 return;
             }
-
 
             try
             {
@@ -43,39 +51,26 @@ namespace Elmo
                     // TODO: Serve RemoteAccessError.html
                 }
 
-                if (PathEquals(context, "json"))
+                // TODO: Correct Encoding.
+
+                PathString subPath;
+                context.Request.Path.StartsWithSegments(options.Path, out subPath);
+
+                var firstOrDefault = handlers.FirstOrDefault(handler => handler.CanProcess(subPath.Value));
+                if (firstOrDefault != null)
                 {
-                    await new ErrorJsonHandler(context, errorLog).ProcessRequestAsync();
-                }
-                else if (PathEquals(context, "rss"))
-                {
-                    await new ErrorRssHandler(context, errorLog).ProcessRequestAsync();
-                }
-                else if (PathEquals(context, "digestrss"))
-                {
-                    await new ErrorDigestRssHandler(context, errorLog).ProcessRequestAsync();
-                }
-                else if (PathEquals(context, "download"))
-                {
-                    await new ErrorLogDownloadHandler(context, errorLog).ProcessRequestAsync();
-                }
-                else if (PathEquals(context, "stylesheet"))
-                {
-                    // TODO: Return specific style sheets and javascript files.
-                    context.Response.StatusCode = 200;
-                    context.Response.ContentType = "text/css";
-                    context.Response.Write(Resources.ErrorLogStyle);
+                    await firstOrDefault.ProcessRequestAsync(context, errorLog);
                 }
                 else
                 {
-                    // TODO: Not found if path doesn't exist.
-                    // TODO: Correct Encoding.
-                    await new ErrorLogView(context, errorLog).RenderAsync();
+                    context.Response.StatusCode = 404;
+                    context.Response.ReasonPhrase = "Not Found";
+                    // TODO: Display proper not found message.
                 }
             }
             catch (Exception e)
             {
-                // TODO: Log this error to generic logger.
+                // TODO: Log this error to built-in owin logger. Display error if possible.
                 Console.WriteLine(e);
             }
         }
@@ -83,11 +78,6 @@ namespace Elmo
         private static bool IsLocalIpAddress(IOwinContext owinContext)
         {
             return Convert.ToBoolean(owinContext.Environment["server.IsLocal"]);
-        }
-
-        private bool PathEquals(IOwinContext context, string segment)
-        {
-            return context.Request.Path.Equals(new PathString(options.Path.Value).Add(new PathString($"/{segment}")));
         }
     }
 }

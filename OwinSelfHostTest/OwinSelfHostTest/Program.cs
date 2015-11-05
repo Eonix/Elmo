@@ -32,7 +32,7 @@ namespace OwinSelfHostTest
             app.UseWelcomePage("/");
         }
 
-        private async Task DoSomething(IOwinContext owinContext, Func<Task> func)
+        private Task DoSomething(IOwinContext owinContext, Func<Task> func)
         {
             throw new Exception();
         }

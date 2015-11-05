@@ -20,11 +20,7 @@ namespace Elmo.Views
 
         private const int DefaultPageSize = 15;
         private const int MaximumPageSize = 100;
-
-        public ErrorLogView(IOwinContext owinContext, IErrorLog errorLog) : base(owinContext, errorLog)
-        {
-        }
-
+        
         protected override async Task RenderContentsAsync(XmlWriter writer)
         {
             await RenderTitleAsync(writer);
@@ -334,6 +330,11 @@ namespace Elmo.Views
             PageTitle = hostName.Length > 0
                 ? $"Error log for {ApplicationName} on {hostName} (Page #{(pageIndex + 1).ToString("N0")})"
                 : $"Error log for {ApplicationName} (Page #{(pageIndex + 1).ToString("N0")})";
+        }
+
+        public override bool CanProcess(string path)
+        {
+            return string.IsNullOrWhiteSpace(path);
         }
 
         private static string GetMachineName()

@@ -4,25 +4,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Elmo.Logging;
+using Elmo.Responses;
 using Microsoft.Owin;
 
 namespace Elmo.Views
 {
-    internal abstract class ErrorViewBase
+    internal abstract class ErrorViewBase : IRequestHandler
     {
-        protected IOwinContext OwinContext;
-
+        protected IOwinContext OwinContext { get; private set; }
         protected string PageTitle { get; set; }
-        protected IErrorLog ErrorLog { get; set; }
+        protected IErrorLog ErrorLog { get; private set; }
         protected string BasePageName => OwinContext.Request.Path.Value.TrimEnd('/');
         protected string ApplicationName => ErrorLog.ApplicationName;
-
-        protected ErrorViewBase(IOwinContext owinContext, IErrorLog errorLog)
-        {
-            this.OwinContext = owinContext;
-            ErrorLog = errorLog;
-        }
-
+        
         private async Task RenderDocumentStartAsync(XmlWriter writer)
         {
             await writer.WriteDocTypeAsync("html", null, null, null); // doctype
@@ -96,7 +90,7 @@ namespace Elmo.Views
             await writer.WriteEndElementAsync(); // </html>
         }
 
-        public async Task RenderAsync()
+        private async Task RenderAsync()
         {
             var settings = new XmlWriterSettings
             {
@@ -125,5 +119,17 @@ namespace Elmo.Views
         protected abstract Task RenderContentsAsync(XmlWriter writer);
 
         protected abstract Task LoadContentsAsync();
+
+        public async Task ProcessRequestAsync(IOwinContext owinContext, IErrorLog errorLog)
+        {
+            OwinContext = owinContext;
+            ErrorLog = errorLog;
+            await RenderAsync();
+            Processed = true;
+        }
+
+        public abstract bool CanProcess(string path);
+
+        public bool Processed { get; private set; }
     }
 }

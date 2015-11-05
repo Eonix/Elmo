@@ -7,18 +7,9 @@ using Newtonsoft.Json;
 
 namespace Elmo.Responses
 {
-    internal class ErrorJsonHandler
+    internal class ErrorJsonHandler : IRequestHandler
     {
-        private readonly IOwinContext owinContext;
-        private readonly IErrorLog errorLog;
-
-        public ErrorJsonHandler(IOwinContext owinContext, IErrorLog errorLog)
-        {
-            this.owinContext = owinContext;
-            this.errorLog = errorLog;
-        }
-
-        public async Task ProcessRequestAsync()
+        public async Task ProcessRequestAsync(IOwinContext owinContext, IErrorLog errorLog)
         {
             owinContext.Response.ContentType = "application/json";
 
@@ -46,6 +37,11 @@ namespace Elmo.Responses
             {
                 JsonSerializer.Create().Serialize(jsonTextWriter, errorLogEntry.Error);
             }
+        }
+
+        public bool CanProcess(string path)
+        {
+            return path.StartsWith("/json");
         }
     }
 }

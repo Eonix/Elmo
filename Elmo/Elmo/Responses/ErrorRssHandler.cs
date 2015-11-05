@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel.Syndication;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,18 +10,9 @@ using Microsoft.Owin;
 
 namespace Elmo.Responses
 {
-    internal class ErrorRssHandler
+    internal class ErrorRssHandler : IRequestHandler
     {
-        private readonly IOwinContext owinContext;
-        private readonly IErrorLog errorLog;
-
-        public ErrorRssHandler(IOwinContext owinContext, IErrorLog errorLog)
-        {
-            this.owinContext = owinContext;
-            this.errorLog = errorLog;
-        }
-
-        public async Task ProcessRequestAsync()
+        public async Task ProcessRequestAsync(IOwinContext owinContext, IErrorLog errorLog)
         {
             const int pageSize = 15;
             var errorLogEntries = await errorLog.GetErrorsAsync(0, pageSize);
@@ -73,6 +63,11 @@ namespace Elmo.Responses
                 var formatter = new Rss20FeedFormatter(syndicationFeed);
                 formatter.WriteTo(writer);
             }
+        }
+
+        public bool CanProcess(string path)
+        {
+            return path.StartsWith("/rss");
         }
     }
 }

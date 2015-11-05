@@ -11,18 +11,9 @@ using Microsoft.Owin;
 
 namespace Elmo.Responses
 {
-    internal class ErrorDigestRssHandler
+    internal class ErrorDigestRssHandler : IRequestHandler
     {
-        private readonly IOwinContext owinContext;
-        private readonly IErrorLog errorLog;
-
-        public ErrorDigestRssHandler(IOwinContext owinContext, IErrorLog errorLog)
-        {
-            this.owinContext = owinContext;
-            this.errorLog = errorLog;
-        }
-
-        public async Task ProcessRequestAsync()
+        public async Task ProcessRequestAsync(IOwinContext owinContext, IErrorLog errorLog)
         {
             var syndicationFeed = new SyndicationFeed();
 
@@ -35,7 +26,7 @@ namespace Elmo.Responses
             var baseUri = new Uri(uriAsString.Remove(uriAsString.LastIndexOf("/digestrss", StringComparison.InvariantCulture)));
             syndicationFeed.Links.Add(SyndicationLink.CreateAlternateLink(baseUri));
 
-            var logEntries = await GetAllEntriesAsync();
+            var logEntries = await GetAllEntriesAsync(errorLog);
             var groupBy = logEntries.GroupBy(
                 entry => new DateTime(entry.Error.Time.Year, entry.Error.Time.Month, entry.Error.Time.Day));
 
@@ -89,7 +80,12 @@ namespace Elmo.Responses
             }
         }
 
-        private async Task<IEnumerable<ErrorLogEntry>> GetAllEntriesAsync()
+        public bool CanProcess(string path)
+        {
+            return path.StartsWith("/digestrss");
+        }
+        
+        private async Task<IEnumerable<ErrorLogEntry>> GetAllEntriesAsync(IErrorLog errorLog)
         {
             const int defaultPageSize = 30;
             const int maxPageLimit = 30;
