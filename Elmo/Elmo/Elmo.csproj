@@ -74,11 +74,13 @@
     <Compile Include="Responses\ErrorLogDownloadHandler.cs" />
     <Compile Include="Responses\ErrorRssHandler.cs" />
     <Compile Include="Responses\IRequestHandler.cs" />
+    <Compile Include="Responses\Views\ErrorDetailView.cs" />
     <Compile Include="Utilities\EnvironmentUtilities.cs" />
     <Compile Include="Utilities\HttpCodeParser.cs" />
-    <Compile Include="Views\Components\SpeedBarComponent.cs" />
-    <Compile Include="Views\ErrorLogView.cs" />
-    <Compile Include="Views\ErrorViewBase.cs" />
+    <Compile Include="Responses\Views\Components\SpeedBarComponent.cs" />
+    <Compile Include="Responses\Views\ErrorLogView.cs" />
+    <Compile Include="Responses\Views\ErrorViewBase.cs" />
+    <Compile Include="Utilities\XmlWriterExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -93,7 +95,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\ErrorLogStyle.css" />
+    <Content Include="Responses\Views\ErrorLogStyle.css" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

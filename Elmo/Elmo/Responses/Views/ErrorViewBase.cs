@@ -4,45 +4,52 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Elmo.Logging;
-using Elmo.Responses;
+using Elmo.Utilities;
 using Microsoft.Owin;
 
-namespace Elmo.Views
+namespace Elmo.Responses.Views
 {
     internal abstract class ErrorViewBase : IRequestHandler
     {
+        private readonly PathString rootPath;
+
         protected IOwinContext OwinContext { get; private set; }
         protected string PageTitle { get; set; }
         protected IErrorLog ErrorLog { get; private set; }
-        protected string BasePageName => OwinContext.Request.Path.Value.TrimEnd('/');
+        protected string BasePageName { get; private set; }
         protected string ApplicationName => ErrorLog.ApplicationName;
-        
+
+        protected ErrorViewBase(PathString rootPath)
+        {
+            this.rootPath = rootPath;
+        }
+
         private async Task RenderDocumentStartAsync(XmlWriter writer)
         {
-            await writer.WriteDocTypeAsync("html", null, null, null); // doctype
+            await writer.WriteDocTypeAsync("html"); // doctype
 
             await writer.WriteStartElementAsync(null, "html", "http://www.w3.org/1999/xhtml"); // html start
 
-            await writer.WriteStartElementAsync(null, "head", null); // head start
+            await writer.WriteStartElementAsync("head"); // head start
             await RenderHeadAsync(writer);
             await writer.WriteEndElementAsync(); // head end
 
-            await writer.WriteStartElementAsync(null, "body", null); // body start
+            await writer.WriteStartElementAsync("body"); // body start
         }
 
         private async Task RenderHeadAsync(XmlWriter writer)
         {
-            await writer.WriteStartElementAsync(null, "meta", null);
-            await writer.WriteAttributeStringAsync(null, "http-equiv", null, "X-UA-Compatible");
-            await writer.WriteAttributeStringAsync(null, "content", null, "IE=EmulateIE7");
+            await writer.WriteStartElementAsync("meta");
+            await writer.WriteAttributeStringAsync("http-equiv", "X-UA-Compatible");
+            await writer.WriteAttributeStringAsync("content", "IE=EmulateIE7");
             await writer.WriteEndElementAsync();
 
-            await writer.WriteElementStringAsync(null, "title", null, PageTitle);
+            await writer.WriteElementStringAsync("title", PageTitle);
 
-            await writer.WriteStartElementAsync(null, "link", null);
-            await writer.WriteAttributeStringAsync(null, "rel", null, "stylesheet");
-            await writer.WriteAttributeStringAsync(null, "type", null, "text/css");
-            await writer.WriteAttributeStringAsync(null, "href", null, BasePageName + "/stylesheet");
+            await writer.WriteStartElementAsync("link");
+            await writer.WriteAttributeStringAsync("rel", "stylesheet");
+            await writer.WriteAttributeStringAsync("type", "text/css");
+            await writer.WriteAttributeStringAsync("href", BasePageName + "/stylesheet");
             await writer.WriteEndElementAsync();
         }
         
@@ -52,8 +59,8 @@ namespace Elmo.Views
             // Write the powered-by signature, that includes version information.
             //
 
-            await writer.WriteStartElementAsync(null, "p", null); // <p>
-            await writer.WriteAttributeStringAsync(null, "id", null, "Footer");
+            await writer.WriteStartElementAsync("p"); // <p>
+            await writer.WriteAttributeStringAsync("id", "Footer");
 
 
             //PoweredBy poweredBy = new PoweredBy();
@@ -124,12 +131,12 @@ namespace Elmo.Views
         {
             OwinContext = owinContext;
             ErrorLog = errorLog;
+
+            var requestPath = OwinContext.Request.Path.Value;
+            BasePageName = requestPath.Substring(requestPath.LastIndexOf(rootPath.Value, StringComparison.Ordinal), rootPath.Value.Length);
             await RenderAsync();
-            Processed = true;
         }
 
         public abstract bool CanProcess(string path);
-
-        public bool Processed { get; private set; }
     }
 }

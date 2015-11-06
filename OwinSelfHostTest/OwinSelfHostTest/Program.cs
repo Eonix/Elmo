@@ -27,9 +27,9 @@ namespace OwinSelfHostTest
         {
             app.UseElmoViewer("/elmo");
             app.UseElmo();
+            //app.UseErrorPage();
+            //app.UseWelcomePage("/");
             app.Use(DoSomething);
-            app.UseErrorPage();
-            app.UseWelcomePage("/");
         }
 
         private Task DoSomething(IOwinContext owinContext, Func<Task> func)

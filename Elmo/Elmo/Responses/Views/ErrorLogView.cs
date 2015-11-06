@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Elmo.Logging;
+using Elmo.Responses.Views.Components;
 using Elmo.Utilities;
-using Elmo.Views.Components;
 using Microsoft.Owin;
 
-namespace Elmo.Views
+namespace Elmo.Responses.Views
 {
     internal class ErrorLogView : ErrorViewBase
     {
@@ -347,6 +346,10 @@ namespace Elmo.Views
             {
                 return string.Empty;
             }
+        }
+
+        public ErrorLogView(PathString rootPath) : base(rootPath)
+        {
         }
     }
 }

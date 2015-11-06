@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Elmo.Logging;
 using Elmo.Responses;
-using Elmo.Views;
+using Elmo.Responses.Views;
 using Microsoft.Owin;
 
 namespace Elmo
@@ -28,7 +28,8 @@ namespace Elmo
                 new ErrorDigestRssHandler(),
                 new ErrorLogDownloadHandler(),
                 new ErrorLogCssHandler(),
-                new ErrorLogView()
+                new ErrorLogView(options.Path),
+                new ErrorDetailView(options.Path)
             };
         }
 
