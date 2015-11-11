@@ -10,7 +10,7 @@ namespace Elmo.Utilities
             {
                 return Environment.MachineName;
             }
-            catch (Exception)
+            catch (InvalidOperationException)
             {
                 return defaultValue;
             }

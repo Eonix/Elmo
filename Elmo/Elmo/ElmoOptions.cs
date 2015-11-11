@@ -4,7 +4,7 @@ namespace Elmo
 {
     public class ElmoOptions
     {
-        public PathString Path { get; set; }
+        public PathString Path { get; set; } = new PathString("/elmo");
         public bool AllowRemoteAccess { get; set; }
     }
 }

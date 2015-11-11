@@ -6,6 +6,9 @@ using Elmo.Logging;
 using Elmo.Responses;
 using Elmo.Responses.Views;
 using Microsoft.Owin;
+using Microsoft.Owin.Logging;
+using Microsoft.Owin.Security;
+using Owin;
 
 namespace Elmo
 {
@@ -14,12 +17,14 @@ namespace Elmo
         private readonly ElmoOptions options;
         private readonly IErrorLog errorLog;
         private readonly List<IRequestHandler> handlers;
+        private readonly ILogger logger;
 
-        public ElmoViewerMiddleware(OwinMiddleware next, ElmoOptions options, IErrorLog errorLog)
+        public ElmoViewerMiddleware(OwinMiddleware next, IAppBuilder app, ElmoOptions options, IErrorLog errorLog)
             : base(next)
         {
             this.options = options;
             this.errorLog = errorLog;
+            logger = app.CreateLogger<ElmoViewerMiddleware>();
 
             handlers = new List<IRequestHandler>
             {
@@ -43,37 +48,31 @@ namespace Elmo
 
             try
             {
-                if (!options.AllowRemoteAccess && !IsLocalIpAddress(context))
+                if (!options.AllowRemoteAccess && !IsLocalIpAddress(context) && IsAuthenticated(context.Authentication))
                 {
-                    // TODO: Check if authorized.
-                    context.Response.StatusCode = 403;
-                    context.Response.ReasonPhrase = "Forbidden";
+                    await new RemoteAccessErrorView().ProcessRequestAsync(context, errorLog);
                     return;
-                    // TODO: Serve RemoteAccessError.html
                 }
-
-                // TODO: Correct Encoding.
 
                 PathString subPath;
                 context.Request.Path.StartsWithSegments(options.Path, out subPath);
 
                 var firstOrDefault = handlers.FirstOrDefault(handler => handler.CanProcess(subPath.Value));
+
                 if (firstOrDefault != null)
-                {
                     await firstOrDefault.ProcessRequestAsync(context, errorLog);
-                }
                 else
-                {
-                    context.Response.StatusCode = 404;
-                    context.Response.ReasonPhrase = "Not Found";
-                    // TODO: Display proper not found message.
-                }
+                    await new NotFoundErrorView().ProcessRequestAsync(context, errorLog);
             }
             catch (Exception e)
             {
-                // TODO: Log this error to built-in owin logger. Display error if possible.
-                Console.WriteLine(e);
+                logger.WriteError("An error occured while processing Elmo Viewer middleware.", e);
             }
+        }
+
+        private static bool IsAuthenticated(IAuthenticationManager authenticationManager)
+        {
+            return authenticationManager?.User?.Identity != null && authenticationManager.User.Identity.IsAuthenticated;
         }
 
         private static bool IsLocalIpAddress(IOwinContext owinContext)

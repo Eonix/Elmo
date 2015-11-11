@@ -190,10 +190,7 @@ namespace Elmo.Responses.Views
 
             errorLogEntry = await ErrorLog.GetErrorAsync(errorId);
             if (errorLogEntry == null)
-            {
-                // TODO: Find a good way to handle not found.
                 return;
-            }
 
             PageTitle = $"Error: {errorLogEntry.Error.TypeName} [{errorLogEntry.Id}]";
         }

@@ -75,6 +75,8 @@
     <Compile Include="Responses\ErrorRssHandler.cs" />
     <Compile Include="Responses\IRequestHandler.cs" />
     <Compile Include="Responses\Views\ErrorDetailView.cs" />
+    <Compile Include="Responses\Views\NotFoundErrorView.cs" />
+    <Compile Include="Responses\Views\RemoteAccessErrorView.cs" />
     <Compile Include="Utilities\EnvironmentUtilities.cs" />
     <Compile Include="Utilities\HttpCodeParser.cs" />
     <Compile Include="Responses\Views\Components\SpeedBarComponent.cs" />

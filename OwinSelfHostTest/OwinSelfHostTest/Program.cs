@@ -25,8 +25,8 @@ namespace OwinSelfHostTest
     {
         public void Configuration(IAppBuilder app)
         {
+            app.UseElmoMemoryLog();
             app.UseElmoViewer("/elmo");
-            app.UseElmo();
             //app.UseErrorPage();
             //app.UseWelcomePage("/");
             app.Use(DoSomething);
