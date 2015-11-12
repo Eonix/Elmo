@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Elmo.Logging;
-using Elmo.Utilities;
 using Microsoft.Owin;
+using Elmo.Viewer.Utilities;
 
-namespace Elmo.Responses.Views
+namespace Elmo.Viewer.Responses.Views
 {
-    internal class RemoteAccessErrorView : IRequestHandler
+    internal class NotFoundErrorView : IRequestHandler
     {
         public async Task ProcessRequestAsync(IOwinContext owinContext, IErrorLog errorLog)
         {
@@ -25,8 +23,8 @@ namespace Elmo.Responses.Views
 
             var response = owinContext.Response;
             response.ContentType = "text/html";
-            response.StatusCode = 403;
-            response.ReasonPhrase = "Forbidden";
+            response.StatusCode = 404;
+            response.ReasonPhrase = "Not Found";
 
             using (var writer = XmlWriter.Create(response.Body, settings))
             {
@@ -36,14 +34,14 @@ namespace Elmo.Responses.Views
                 {
                     await writer.WriteStartElementAsync("head");
                     {
-                        await writer.WriteElementStringAsync("title", "403 Forbidden");
+                        await writer.WriteElementStringAsync("title", "404 Not Found");
                     }
                     await writer.WriteEndElementAsync();
 
                     await writer.WriteStartElementAsync("body");
                     {
-                        await writer.WriteElementStringAsync("h1", "Forbidden");
-                        await writer.WriteElementStringAsync("p", $"You don't have permission to access {owinContext.Request.Path} on this server.");
+                        await writer.WriteElementStringAsync("h1", "Not Found");
+                        await writer.WriteElementStringAsync("p", $"The requested URL {owinContext.Request.Path} was not found on this server.");
                     }
                     await writer.WriteEndElementAsync();
                 }

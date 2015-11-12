@@ -5,7 +5,7 @@ using Elmo.Logging;
 using Microsoft.Owin;
 using Newtonsoft.Json;
 
-namespace Elmo.Responses
+namespace Elmo.Viewer.Responses
 {
     internal class ErrorJsonHandler : IRequestHandler
     {

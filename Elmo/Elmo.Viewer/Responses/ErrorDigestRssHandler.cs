@@ -9,7 +9,7 @@ using Elmo.Logging;
 using Elmo.Utilities;
 using Microsoft.Owin;
 
-namespace Elmo.Responses
+namespace Elmo.Viewer.Responses
 {
     internal class ErrorDigestRssHandler : IRequestHandler
     {

@@ -81,6 +81,7 @@ namespace Elmo.Logging.Loggers
         }
 
         public string Name => "In-Memory Error Log";
+
         public string ApplicationName => AppDomain.CurrentDomain.FriendlyName;
 
         private class FixedSizeCollection

@@ -2,7 +2,7 @@
 using Elmo.Logging;
 using Microsoft.Owin;
 
-namespace Elmo.Responses
+namespace Elmo.Viewer.Responses
 {
     internal interface IRequestHandler
     {

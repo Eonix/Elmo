@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Xml;
 
-namespace Elmo.Utilities
+namespace Elmo.Viewer.Utilities
 {
     internal static class XmlWriterExtensions
     {

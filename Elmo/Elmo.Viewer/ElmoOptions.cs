@@ -1,6 +1,6 @@
 ﻿using Microsoft.Owin;
 
-namespace Elmo
+namespace Elmo.Viewer
 {
     public class ElmoOptions
     {

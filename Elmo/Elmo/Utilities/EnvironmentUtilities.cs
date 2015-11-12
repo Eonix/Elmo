@@ -2,7 +2,7 @@
 
 namespace Elmo.Utilities
 {
-    internal static class EnvironmentUtilities
+    public static class EnvironmentUtilities
     {
         public static string GetMachineNameOrDefault(string defaultValue = "")
         {

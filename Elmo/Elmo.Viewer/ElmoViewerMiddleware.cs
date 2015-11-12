@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Elmo.Logging;
-using Elmo.Responses;
-using Elmo.Responses.Views;
+using Elmo.Viewer.Responses;
+using Elmo.Viewer.Responses.Views;
 using Microsoft.Owin;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Owin;
 
-namespace Elmo
+namespace Elmo.Viewer
 {
     public class ElmoViewerMiddleware : OwinMiddleware
     {

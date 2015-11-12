@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Elmo.Logging;
-using Elmo.Properties;
+using Elmo.Viewer.Properties;
 using Microsoft.Owin;
 
-namespace Elmo.Responses
+namespace Elmo.Viewer.Responses
 {
     internal class ErrorLogCssHandler : IRequestHandler
     {

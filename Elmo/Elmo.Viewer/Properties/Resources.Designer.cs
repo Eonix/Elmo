@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Elmo.Properties {
+namespace Elmo.Viewer.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Elmo.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Elmo.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Elmo.Viewer.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,31 @@ namespace Elmo.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /*
+        ///  
+        ///   ELMAH - Error Logging Modules and Handlers for ASP.NET
+        ///   Copyright (c) 2004-9 Atif Aziz. All rights reserved.
+        ///  
+        ///    Author(s):
+        ///  
+        ///        Atif Aziz, http://www.raboof.com
+        ///  
+        ///   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+        ///   you may not use this file except in compliance with the License.
+        ///   You may obtain a copy of the License at
+        ///  
+        ///      http://www.apache.org/licenses/LICENSE-2.0
+        ///  
+        ///   Unless required by applicable law or agreed to in writing, software
+        ///   dist [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ErrorLogStyle {
+            get {
+                return ResourceManager.GetString("ErrorLogStyle", resourceCulture);
             }
         }
     }

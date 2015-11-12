@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Elmo.Utilities;
 using Microsoft.Owin;
 
 namespace Elmo.Logging
@@ -31,7 +32,7 @@ namespace Elmo.Logging
             Exception = exception;
             var baseException = exception.GetBaseException();
 
-            HostName = GetMachineName();
+            HostName = EnvironmentUtilities.GetMachineNameOrDefault();
             TypeName = baseException.GetType().FullName;
             Message = baseException.Message;
             Source = baseException.Source;
@@ -52,18 +53,6 @@ namespace Elmo.Logging
             Query = owinContext.Request.Query.ToDictionary(pair => pair.Key, pair => pair.Value);
             Cookies = owinContext.Request.Cookies.ToDictionary(pair => pair.Key, pair => pair.Value);
             ApplicationName = AppDomain.CurrentDomain.FriendlyName;
-        }
-        
-        private static string GetMachineName()
-        {
-            try
-            {
-                return Environment.MachineName;
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
         }
     }
 }

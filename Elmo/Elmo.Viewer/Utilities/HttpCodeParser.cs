@@ -1,18 +1,18 @@
-﻿using static System.String;
+﻿using System;
 
-namespace Elmo.Utilities
+namespace Elmo.Viewer.Utilities
 {
     internal static class HttpCodeParser
     {
         public static string GetstatusDescription(int code)
         {
             if (code < 100 || code >= 600)
-                return Empty;
+                return String.Empty;
 
             var i = code/100;
             var j = code%100;
 
-            return j < HttpStatusDescriptions[i].Length ? HttpStatusDescriptions[i][j] : Empty;
+            return j < HttpStatusDescriptions[i].Length ? HttpStatusDescriptions[i][j] : String.Empty;
         }
 
         private static readonly string[][] HttpStatusDescriptions = {
@@ -45,7 +45,7 @@ namespace Elmo.Utilities
                 /* 303 */ "See Other", 
                 /* 304 */ "Not Modified", 
                 /* 305 */ "Use Proxy",
-                /* 306 */ Empty, 
+                /* 306 */ String.Empty, 
                 /* 307 */ "Temporary Redirect"
             },
 
@@ -69,10 +69,10 @@ namespace Elmo.Utilities
                 /* 415 */ "Unsupported Media Type",
                 /* 416 */ "Requested Range Not Satisfiable", 
                 /* 417 */ "Expectation Failed",
-                /* 418 */ Empty, 
-                /* 419 */ Empty, 
-                /* 420 */ Empty,
-                /* 421 */ Empty, 
+                /* 418 */ String.Empty, 
+                /* 419 */ String.Empty, 
+                /* 420 */ String.Empty,
+                /* 421 */ String.Empty, 
                 /* 422 */ "Unprocessable Entity",
                 /* 423 */ "Locked",
                 /* 424 */ "Failed Dependency"
@@ -86,7 +86,7 @@ namespace Elmo.Utilities
                 /* 503 */ "Service Unavailable",
                 /* 504 */ "Gateway Timeout",
                 /* 505 */ "Http Version Not Supported", 
-                /* 506 */ Empty,
+                /* 506 */ String.Empty,
                 /* 507 */ "Insufficient Storage"
             }
         };

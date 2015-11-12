@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Xml;
 
-namespace Elmo.Responses.Views.Components
+namespace Elmo.Viewer.Responses.Views.Components
 {
     internal class SpeedBarItem
     {
@@ -26,8 +26,6 @@ namespace Elmo.Responses.Views.Components
         public static SpeedBarItem GetRssDigestFeed(string rootUrl) => new SpeedBarItem("RSS Digest", "RSS feed of errors within recent days.", $"{rootUrl}/digestrss");
 
         public static SpeedBarItem GetDownloadLog(string rootUrl) => new SpeedBarItem("Download Log", "Download the entire log as CSV.", $"{rootUrl}/download");
-
-        //public static SpeedBarItem GetHelp() => new SpeedBarItem("Help", "Documentation, discussions, issues and more.", "#");
 
         public static async Task RenderAsync(XmlWriter writer, params SpeedBarItem[] items)
         {

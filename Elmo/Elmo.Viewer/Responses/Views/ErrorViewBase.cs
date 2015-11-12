@@ -4,10 +4,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Elmo.Logging;
-using Elmo.Utilities;
 using Microsoft.Owin;
+using Elmo.Viewer.Utilities;
 
-namespace Elmo.Responses.Views
+namespace Elmo.Viewer.Responses.Views
 {
     internal abstract class ErrorViewBase : IRequestHandler
     {

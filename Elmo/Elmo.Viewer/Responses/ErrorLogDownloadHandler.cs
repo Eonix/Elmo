@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Elmo.Logging;
 using Microsoft.Owin;
 
-namespace Elmo.Responses
+namespace Elmo.Viewer.Responses
 {
     internal class ErrorLogDownloadHandler : IRequestHandler
     {
@@ -24,7 +25,7 @@ namespace Elmo.Responses
             owinContext.Response.StatusCode = 200;
             owinContext.Response.ReasonPhrase = "Ok";
 
-            using (var writer = new StreamWriter(owinContext.Response.Body))
+            using (var writer = new StreamWriter(owinContext.Response.Body, Encoding.UTF8))
             {
                 await writer.WriteLineAsync("Application,Host,Time,Type,Source,User,Status Code,Message,URL,JSONREF");
 

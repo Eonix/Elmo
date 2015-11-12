@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Elmo.Logging;
-using Elmo.Responses.Views.Components;
-using Elmo.Utilities;
+using Elmo.Viewer.Responses.Views.Components;
+using Elmo.Viewer.Utilities;
 using Microsoft.Owin;
 
-namespace Elmo.Responses.Views
+namespace Elmo.Viewer.Responses.Views
 {
     internal class ErrorDetailView : ErrorViewBase
     {
