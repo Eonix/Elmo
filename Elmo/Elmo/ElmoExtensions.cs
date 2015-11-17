@@ -7,8 +7,6 @@ namespace Elmo
 {
     public static class ElmoExtensions
     {
-        public static string ErrorLogPropertyKey => "Elmo.ErrorLog";
-
         public static IAppBuilder UseElmoMemoryLog(this IAppBuilder app)
         {
             return UseElmo(app, new MemoryErrorLog());
@@ -19,7 +17,7 @@ namespace Elmo
             if (errorLog == null)
                 throw new ArgumentNullException(nameof(errorLog));
 
-            app.Properties.Add(ErrorLogPropertyKey, errorLog);
+            app.Properties.Add(ElmoConstants.ErrorLogPropertyKey, errorLog);
             return app.Use<ElmoMiddleware>(app, errorLog);
         }
     }

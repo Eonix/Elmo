@@ -19,10 +19,10 @@ namespace Elmo.Viewer
 
         public static IAppBuilder UseElmoViewer(this IAppBuilder app, ElmoOptions options)
         {
-            if (!app.Properties.ContainsKey(ElmoExtensions.ErrorLogPropertyKey))
+            if (!app.Properties.ContainsKey(ElmoConstants.ErrorLogPropertyKey))
                 throw new InvalidOperationException("Can't use the Elmo Viewer without registering an Error Logger first.");
 
-            var errorLog = app.Properties[ElmoExtensions.ErrorLogPropertyKey] as IErrorLog;
+            var errorLog = app.Properties[ElmoConstants.ErrorLogPropertyKey] as IErrorLog;
             if (errorLog == null)
                 throw new InvalidOperationException("Can't use the Elmo Viewer without registering an Error Logger first.");
 

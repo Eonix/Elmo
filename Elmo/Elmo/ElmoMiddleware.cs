@@ -24,6 +24,9 @@ namespace Elmo
             try
             {
                 await Next.Invoke(context);
+                var exception = context.Get<Exception>(ElmoConstants.ExceptionKey);
+                if (exception != null)
+                    throw exception;
             }
             catch (Exception exception)
             {

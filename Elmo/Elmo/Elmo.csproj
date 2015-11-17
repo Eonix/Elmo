@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ElmoConstants.cs" />
     <Compile Include="ElmoExtensions.cs" />
     <Compile Include="ElmoMiddleware.cs" />
     <Compile Include="Logging\Error.cs" />
