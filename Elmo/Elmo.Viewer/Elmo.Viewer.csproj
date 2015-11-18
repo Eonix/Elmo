@@ -57,6 +57,9 @@
     <Compile Include="ElmoOptions.cs" />
     <Compile Include="ElmoViewerExtensions.cs" />
     <Compile Include="ElmoViewerMiddleware.cs" />
+    <Compile Include="Middlewares\ErrorJsonMiddleware.cs" />
+    <Compile Include="Middlewares\ErrorRssMiddleware.cs" />
+    <Compile Include="Middlewares\RemoteAccessErrorMiddleware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -64,7 +67,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Responses\ErrorDigestRssHandler.cs" />
-    <Compile Include="Responses\ErrorJsonHandler.cs" />
     <Compile Include="Responses\ErrorLogCssHandler.cs" />
     <Compile Include="Responses\ErrorLogDownloadHandler.cs" />
     <Compile Include="Responses\ErrorRssHandler.cs" />
@@ -74,8 +76,8 @@
     <Compile Include="Responses\Views\ErrorLogView.cs" />
     <Compile Include="Responses\Views\ErrorViewBase.cs" />
     <Compile Include="Responses\Views\NotFoundErrorView.cs" />
-    <Compile Include="Responses\Views\RemoteAccessErrorView.cs" />
     <Compile Include="Utilities\HttpCodeParser.cs" />
+    <Compile Include="Utilities\SettingsUtility.cs" />
     <Compile Include="Utilities\XmlWriterExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

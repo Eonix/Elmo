@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Elmo.Logging;
 using Elmo.Viewer.Responses;
 using Elmo.Viewer.Responses.Views;
 using Microsoft.Owin;
-using Microsoft.Owin.Logging;
-using Microsoft.Owin.Security;
-using Owin;
 
 namespace Elmo.Viewer
 {
@@ -17,19 +13,15 @@ namespace Elmo.Viewer
         private readonly ElmoOptions options;
         private readonly IErrorLog errorLog;
         private readonly List<IRequestHandler> handlers;
-        private readonly ILogger logger;
 
-        public ElmoViewerMiddleware(OwinMiddleware next, IAppBuilder app, ElmoOptions options, IErrorLog errorLog)
+        public ElmoViewerMiddleware(OwinMiddleware next, ElmoOptions options, IErrorLog errorLog)
             : base(next)
         {
             this.options = options;
             this.errorLog = errorLog;
-            logger = app.CreateLogger<ElmoViewerMiddleware>();
 
             handlers = new List<IRequestHandler>
             {
-                new ErrorJsonHandler(),
-                new ErrorRssHandler(),
                 new ErrorDigestRssHandler(),
                 new ErrorLogDownloadHandler(),
                 new ErrorLogCssHandler(),
@@ -46,38 +38,16 @@ namespace Elmo.Viewer
                 return;
             }
 
-            try
-            {
-                if (!options.AllowRemoteAccess && !IsLocalIpAddress(context) && IsAuthenticated(context.Authentication))
-                {
-                    await new RemoteAccessErrorView().ProcessRequestAsync(context, errorLog);
-                    return;
-                }
+            PathString subPath;
+            context.Request.Path.StartsWithSegments(options.Path, out subPath);
 
-                PathString subPath;
-                context.Request.Path.StartsWithSegments(options.Path, out subPath);
+            // TODO: Ensure that the same handlers are not invoked by multiple threads.
+            var firstOrDefault = handlers.FirstOrDefault(handler => handler.CanProcess(subPath.Value));
 
-                var firstOrDefault = handlers.FirstOrDefault(handler => handler.CanProcess(subPath.Value));
-
-                if (firstOrDefault != null)
-                    await firstOrDefault.ProcessRequestAsync(context, errorLog);
-                else
-                    await new NotFoundErrorView().ProcessRequestAsync(context, errorLog);
-            }
-            catch (Exception e)
-            {
-                logger.WriteError("An error occured while processing Elmo Viewer middleware.", e);
-            }
-        }
-
-        private static bool IsAuthenticated(IAuthenticationManager authenticationManager)
-        {
-            return authenticationManager?.User?.Identity != null && authenticationManager.User.Identity.IsAuthenticated;
-        }
-
-        private static bool IsLocalIpAddress(IOwinContext owinContext)
-        {
-            return Convert.ToBoolean(owinContext.Environment["server.IsLocal"]);
+            if (firstOrDefault != null)
+                await firstOrDefault.ProcessRequestAsync(context, errorLog);
+            else
+                await new NotFoundErrorView().ProcessRequestAsync(context, errorLog);
         }
     }
 }

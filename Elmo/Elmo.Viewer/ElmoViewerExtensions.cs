@@ -1,5 +1,6 @@
 ﻿using System;
 using Elmo.Logging;
+using Elmo.Viewer.Middlewares;
 using Microsoft.Owin;
 using Owin;
 
@@ -26,7 +27,16 @@ namespace Elmo.Viewer
             if (errorLog == null)
                 throw new InvalidOperationException("Can't use the Elmo Viewer without registering an Error Logger first.");
 
-            return app.Use<ElmoViewerMiddleware>(app, options, errorLog);
+            return app.MapWhen(context => context.Request.Path.StartsWithSegments(options.Path), builder => Configuration(builder, options));
+        }
+
+        private static void Configuration(IAppBuilder appBuilder, ElmoOptions options)
+        {
+            var errorLog = appBuilder.Properties[ElmoConstants.ErrorLogPropertyKey] as IErrorLog;
+            appBuilder.Use<RemoteAccessErrorMiddleware>(options);
+            appBuilder.Use<ErrorJsonMiddleware>(options, errorLog);
+            appBuilder.Use<ErrorRssMiddleware>(options, errorLog);
+            appBuilder.Use<ElmoViewerMiddleware>(options, errorLog);
         }
     }
 }

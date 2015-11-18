@@ -8,12 +8,13 @@ using Owin;
 
 namespace OwinSelfHostTest
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main()
         {
-            using (WebApp.Start<Startup>("http://localhost:12345"))
+            using (WebApp.Start<Startup>("http://localhost:12345/"))
             {
+                Console.WriteLine("Started");
                 Console.ReadLine();
             }
         }
@@ -26,7 +27,7 @@ namespace OwinSelfHostTest
             app.UseElmoMemoryLog();
             app.UseElmoViewer();
             //app.UseErrorPage();
-            //app.UseWelcomePage("/");
+            app.UseWelcomePage("/");
             app.Use(DoSomething);
         }
 
