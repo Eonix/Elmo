@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elmo.Viewer", "Elmo.Viewer\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elmo.WebApi", "Elmo.WebApi\Elmo.WebApi.csproj", "{AF2288B6-BE25-43B2-8DE1-C347FD521ADD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elmo.Mvc", "Elmo.Mvc\Elmo.Mvc.csproj", "{A42643E4-1143-4D31-8438-3D916F71E502}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{AF2288B6-BE25-43B2-8DE1-C347FD521ADD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF2288B6-BE25-43B2-8DE1-C347FD521ADD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF2288B6-BE25-43B2-8DE1-C347FD521ADD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A42643E4-1143-4D31-8438-3D916F71E502}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A42643E4-1143-4D31-8438-3D916F71E502}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A42643E4-1143-4D31-8438-3D916F71E502}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A42643E4-1143-4D31-8438-3D916F71E502}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

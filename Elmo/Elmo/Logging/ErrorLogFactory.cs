@@ -1,5 +1,4 @@
-﻿using Elmo.Logging.Loggers;
-using Microsoft.Owin;
+﻿using Microsoft.Owin;
 
 namespace Elmo.Logging
 {
@@ -7,8 +6,7 @@ namespace Elmo.Logging
     {
         public static IErrorLog GetDefault(IOwinContext context)
         {
-            // TODO: Get error log from some source.
-            return new MemoryErrorLog();
+            return context.Get<IErrorLog>(ElmoConstants.ErrorLogPropertyKey);
         }
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Elmo.Logging;
 
-namespace Elmo.Logging.Loggers
+namespace Elmo.Loggers
 {
     public class MemoryErrorLog : IErrorLog
     {

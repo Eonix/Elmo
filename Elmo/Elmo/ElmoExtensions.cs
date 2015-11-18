@@ -1,6 +1,6 @@
 ﻿using System;
+using Elmo.Loggers;
 using Elmo.Logging;
-using Elmo.Logging.Loggers;
 using Owin;
 
 namespace Elmo
