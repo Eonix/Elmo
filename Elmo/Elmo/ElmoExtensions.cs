@@ -12,6 +12,11 @@ namespace Elmo
             return UseElmo(app, new MemoryErrorLog());
         }
 
+        public static IAppBuilder UseElmoMemoryLog(this IAppBuilder app, int logSize)
+        {
+            return UseElmo(app, new MemoryErrorLog(logSize));
+        }
+
         public static IAppBuilder UseElmo(this IAppBuilder app, IErrorLog errorLog)
         {
             if (errorLog == null)
