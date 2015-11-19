@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
 using System.Xml;
+using Elmo.Viewer.Utilities;
 
-namespace Elmo.Viewer.Responses.Views.Components
+namespace Elmo.Viewer.Components
 {
     internal class SpeedBarItem
     {
@@ -32,16 +33,16 @@ namespace Elmo.Viewer.Responses.Views.Components
             if (items == null || items.Length == 0)
                 return;
 
-            await writer.WriteStartElementAsync(null, "ul", null);
-            await writer.WriteAttributeStringAsync(null, "id", null, "SpeedList");
+            await writer.WriteStartElementAsync("ul");
+            await writer.WriteAttributeStringAsync("id", "SpeedList");
 
             foreach (var item in items)
             {
-                await writer.WriteStartElementAsync(null, "li", null);
+                await writer.WriteStartElementAsync("li");
 
-                await writer.WriteStartElementAsync(null, "a", null);
-                await writer.WriteAttributeStringAsync(null, "href", null, item.Url);
-                await writer.WriteAttributeStringAsync(null, "title", null, item.Title);
+                await writer.WriteStartElementAsync("a");
+                await writer.WriteAttributeStringAsync("href", item.Url);
+                await writer.WriteAttributeStringAsync("title", item.Title);
                 await writer.WriteStringAsync(item.Label);
                 await writer.WriteEndElementAsync();
 

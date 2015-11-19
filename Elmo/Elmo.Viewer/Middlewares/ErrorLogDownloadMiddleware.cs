@@ -5,27 +5,43 @@ using System.Threading.Tasks;
 using Elmo.Logging;
 using Microsoft.Owin;
 
-namespace Elmo.Viewer.Responses
+namespace Elmo.Viewer.Middlewares
 {
-    internal class ErrorLogDownloadHandler : IRequestHandler
+    internal class ErrorLogDownloadMiddleware : OwinMiddleware
     {
-        public async Task ProcessRequestAsync(IOwinContext owinContext, IErrorLog errorLog)
+        private readonly ElmoViewerOptions options;
+        private readonly IErrorLog errorLog;
+
+        public ErrorLogDownloadMiddleware(OwinMiddleware next, ElmoViewerOptions options, IErrorLog errorLog) : base(next)
         {
+            this.options = options;
+            this.errorLog = errorLog;
+        }
+
+        public override async Task Invoke(IOwinContext context)
+        {
+            PathString subPath;
+            context.Request.Path.StartsWithSegments(options.Path, out subPath);
+            if (!subPath.StartsWithSegments(new PathString("/download")))
+            {
+                await Next.Invoke(context);
+                return;
+            }
+
             const int defaultPageSize = 100;
             var pageIndex = 0;
             var count = 0;
 
             var total = await errorLog.GetTotalErrorCountAsync();
-            var limit = Convert.ToInt32(owinContext.Request.Query["limit"]);
+            var limit = Convert.ToInt32(context.Request.Query["limit"]);
             var maxDownloadCount = limit > 0 ? Math.Min(total, limit) : total;
-            var requestUrl = owinContext.Request.Uri;
+            var requestUrl = context.Request.Uri;
 
-            owinContext.Response.ContentType = "text/csv; header=present";
-            owinContext.Response.Headers.Append("Content-Disposition", "attachment; filename=errorlog.csv");
-            owinContext.Response.StatusCode = 200;
-            owinContext.Response.ReasonPhrase = "Ok";
+            context.Response.ContentType = "text/csv; header=present";
+            context.Response.Headers.Set("Content-Disposition", "attachment; filename=errorlog.csv");
+            context.Response.StatusCode = 200;
 
-            using (var writer = new StreamWriter(owinContext.Response.Body, Encoding.UTF8))
+            using (var writer = new StreamWriter(context.Response.Body, Encoding.UTF8))
             {
                 await writer.WriteLineAsync("Application,Host,Time,Type,Source,User,Status Code,Message,URL,JSONREF");
 
@@ -44,11 +60,6 @@ namespace Elmo.Viewer.Responses
                     }
                 } while (count < maxDownloadCount);
             }
-        }
-
-        public bool CanProcess(string path)
-        {
-            return path.StartsWith("/download");
         }
     }
 }

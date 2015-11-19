@@ -7,14 +7,32 @@ using System.Threading.Tasks;
 using System.Xml;
 using Elmo.Logging;
 using Elmo.Utilities;
+using Elmo.Viewer.Utilities;
 using Microsoft.Owin;
 
-namespace Elmo.Viewer.Responses
+namespace Elmo.Viewer.Middlewares
 {
-    internal class ErrorDigestRssHandler : IRequestHandler
+    internal class ErrorDigestRssMiddleware : OwinMiddleware
     {
-        public async Task ProcessRequestAsync(IOwinContext owinContext, IErrorLog errorLog)
+        private readonly ElmoViewerOptions options;
+        private readonly IErrorLog errorLog;
+
+        public ErrorDigestRssMiddleware(OwinMiddleware next, ElmoViewerOptions options, IErrorLog errorLog) : base(next)
         {
+            this.options = options;
+            this.errorLog = errorLog;
+        }
+
+        public override async Task Invoke(IOwinContext context)
+        {
+            PathString subPath;
+            context.Request.Path.StartsWithSegments(options.Path, out subPath);
+            if (!subPath.StartsWithSegments(new PathString("/digestrss")))
+            {
+                await Next.Invoke(context);
+                return;
+            }
+
             var syndicationFeed = new SyndicationFeed();
 
             var hostName = EnvironmentUtilities.GetMachineNameOrDefault("Unknown Host");
@@ -22,15 +40,15 @@ namespace Elmo.Viewer.Responses
             syndicationFeed.Description = new TextSyndicationContent("Daily digest of application errors");
             syndicationFeed.Language = "en-us";
 
-            var uriAsString = owinContext.Request.Uri.ToString();
+            var uriAsString = context.Request.Uri.ToString();
             var baseUri = new Uri(uriAsString.Remove(uriAsString.LastIndexOf("/digestrss", StringComparison.InvariantCulture)));
             syndicationFeed.Links.Add(SyndicationLink.CreateAlternateLink(baseUri));
 
-            var logEntries = await GetAllEntriesAsync(errorLog);
+            var logEntries = await GetAllEntriesAsync();
             var groupBy = logEntries.GroupBy(
                 entry => new DateTime(entry.Error.Time.Year, entry.Error.Time.Month, entry.Error.Time.Day));
 
-            
+
             var itemList = new List<SyndicationItem>();
             foreach (var grouping in groupBy)
             {
@@ -61,31 +79,17 @@ namespace Elmo.Viewer.Responses
 
             syndicationFeed.Items = itemList;
 
-            owinContext.Response.ContentType = "application/rss+xml";
-            owinContext.Response.StatusCode = 200;
-            owinContext.Response.ReasonPhrase = "Ok";
-
-            var xmlWriterSettings = new XmlWriterSettings
-            {
-                Indent = true,
-                IndentChars = "  ",
-                Encoding = Encoding.UTF8,
-                OmitXmlDeclaration = true
-            };
-
-            using (var writer = XmlWriter.Create(owinContext.Response.Body, xmlWriterSettings))
+            context.Response.ContentType = "application/rss+xml";
+            context.Response.StatusCode = 200;
+            
+            using (var writer = XmlWriter.Create(context.Response.Body, SettingsUtility.XmlWriterSettings))
             {
                 var formatter = new Rss20FeedFormatter(syndicationFeed);
                 formatter.WriteTo(writer);
             }
         }
 
-        public bool CanProcess(string path)
-        {
-            return path.StartsWith("/digestrss");
-        }
-        
-        private async Task<IEnumerable<ErrorLogEntry>> GetAllEntriesAsync(IErrorLog errorLog)
+        private async Task<IEnumerable<ErrorLogEntry>> GetAllEntriesAsync()
         {
             const int defaultPageSize = 30;
             const int maxPageLimit = 30;

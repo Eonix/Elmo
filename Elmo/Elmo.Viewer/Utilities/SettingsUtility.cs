@@ -7,6 +7,7 @@ namespace Elmo.Viewer.Utilities
     {
         public static XmlWriterSettings XmlWriterSettings => new XmlWriterSettings
         {
+            Async = true,
             Indent = true,
             IndentChars = "  ",
             Encoding = Encoding.UTF8,

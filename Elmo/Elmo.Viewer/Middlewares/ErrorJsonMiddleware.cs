@@ -9,10 +9,10 @@ namespace Elmo.Viewer.Middlewares
 {
     internal class ErrorJsonMiddleware : OwinMiddleware
     {
-        private readonly ElmoOptions options;
+        private readonly ElmoViewerOptions options;
         private readonly IErrorLog errorLog;
 
-        public ErrorJsonMiddleware(OwinMiddleware next, ElmoOptions options, IErrorLog errorLog) : base(next)
+        public ErrorJsonMiddleware(OwinMiddleware next, ElmoViewerOptions options, IErrorLog errorLog) : base(next)
         {
             this.options = options;
             this.errorLog = errorLog;
@@ -21,8 +21,8 @@ namespace Elmo.Viewer.Middlewares
         public override async Task Invoke(IOwinContext context)
         {
             PathString subPath;
-            var isElmoRequest = context.Request.Path.StartsWithSegments(options.Path, out subPath);
-            if (!options.Path.HasValue || !(isElmoRequest && subPath.StartsWithSegments(new PathString("/json"))))
+            context.Request.Path.StartsWithSegments(options.Path, out subPath);
+            if (!subPath.StartsWithSegments(new PathString("/json")))
             {
                 await Next.Invoke(context);
                 return;
@@ -49,7 +49,7 @@ namespace Elmo.Viewer.Middlewares
             using (var streamWriter = new StreamWriter(context.Response.Body, Encoding.UTF8))
             using (var jsonTextWriter = new JsonTextWriter(streamWriter))
             {
-                JsonSerializer.Create().Serialize(jsonTextWriter, errorLogEntry.Error);
+                JsonSerializer.Create(new JsonSerializerSettings {Formatting = Formatting.Indented}).Serialize(jsonTextWriter, errorLogEntry.Error);
             }
         }
     }

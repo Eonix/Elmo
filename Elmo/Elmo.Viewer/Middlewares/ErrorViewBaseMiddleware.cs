@@ -1,27 +1,40 @@
 ﻿using System;
 using System.Globalization;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Elmo.Logging;
-using Microsoft.Owin;
 using Elmo.Viewer.Utilities;
+using Microsoft.Owin;
 
-namespace Elmo.Viewer.Responses.Views
+namespace Elmo.Viewer.Middlewares
 {
-    internal abstract class ErrorViewBase : IRequestHandler
+    internal abstract class ErrorViewBaseMiddleware : OwinMiddleware
     {
-        private readonly PathString rootPath;
-
-        protected IOwinContext OwinContext { get; private set; }
+        public ElmoViewerOptions Options { get; }
         protected string PageTitle { get; set; }
-        protected IErrorLog ErrorLog { get; private set; }
-        protected string BasePageName { get; private set; }
+        protected IErrorLog ErrorLog { get; }
+        protected string BasePageName => Options.Path.Value;
         protected string ApplicationName => ErrorLog.ApplicationName;
 
-        protected ErrorViewBase(PathString rootPath)
+        protected abstract string SubPath { get; }
+
+        protected ErrorViewBaseMiddleware(OwinMiddleware next, ElmoViewerOptions options, IErrorLog errorLog) : base(next)
         {
-            this.rootPath = rootPath;
+            Options = options;
+            ErrorLog = errorLog;
+        }
+
+        public override async Task Invoke(IOwinContext context)
+        {
+            PathString subPath;
+            context.Request.Path.StartsWithSegments(Options.Path, out subPath);
+            if (subPath.Value.TrimEnd('/') != SubPath)
+            {
+                await Next.Invoke(context);
+                return;
+            }
+            
+            await RenderAsync(context);
         }
 
         private async Task RenderDocumentStartAsync(XmlWriter writer)
@@ -97,25 +110,15 @@ namespace Elmo.Viewer.Responses.Views
             await writer.WriteEndElementAsync(); // </html>
         }
 
-        private async Task RenderAsync()
+        private async Task RenderAsync(IOwinContext context)
         {
-            var settings = new XmlWriterSettings
-            {
-                Async = true,
-                Indent = true,
-                IndentChars = "  ",
-                Encoding = Encoding.UTF8,
-                OmitXmlDeclaration = true
-            };
+            await LoadContentsAsync(context);
 
-            await LoadContentsAsync();
-
-            var response = OwinContext.Response;
+            var response = context.Response;
             response.ContentType = "text/html";
             response.StatusCode = 200;
-            response.ReasonPhrase = "Ok";
 
-            using (var writer = XmlWriter.Create(response.Body, settings))
+            using (var writer = XmlWriter.Create(response.Body, SettingsUtility.XmlWriterSettings))
             {
                 await RenderDocumentStartAsync(writer);
                 await RenderContentsAsync(writer);
@@ -125,18 +128,6 @@ namespace Elmo.Viewer.Responses.Views
 
         protected abstract Task RenderContentsAsync(XmlWriter writer);
 
-        protected abstract Task LoadContentsAsync();
-
-        public async Task ProcessRequestAsync(IOwinContext owinContext, IErrorLog errorLog)
-        {
-            OwinContext = owinContext;
-            ErrorLog = errorLog;
-
-            var requestPath = OwinContext.Request.Path.Value;
-            BasePageName = requestPath.Substring(requestPath.LastIndexOf(rootPath.Value, StringComparison.Ordinal), rootPath.Value.Length);
-            await RenderAsync();
-        }
-
-        public abstract bool CanProcess(string path);
+        protected abstract Task LoadContentsAsync(IOwinContext context);
     }
 }

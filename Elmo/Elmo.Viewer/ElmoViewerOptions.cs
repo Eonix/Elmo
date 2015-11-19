@@ -2,7 +2,7 @@
 
 namespace Elmo.Viewer
 {
-    public class ElmoOptions
+    public class ElmoViewerOptions
     {
         public PathString Path { get; set; } = new PathString("/elmo");
         public bool AllowRemoteAccess { get; set; }

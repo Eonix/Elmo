@@ -54,10 +54,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ElmoOptions.cs" />
+    <Compile Include="ElmoViewerOptions.cs" />
     <Compile Include="ElmoViewerExtensions.cs" />
-    <Compile Include="ElmoViewerMiddleware.cs" />
+    <Compile Include="Middlewares\NotFoundErrorMiddleware.cs" />
+    <Compile Include="Middlewares\ErrorDigestRssMiddleware.cs" />
     <Compile Include="Middlewares\ErrorJsonMiddleware.cs" />
+    <Compile Include="Middlewares\ErrorLogCssMiddleware.cs" />
+    <Compile Include="Middlewares\ErrorLogDownloadMiddleware.cs" />
     <Compile Include="Middlewares\ErrorRssMiddleware.cs" />
     <Compile Include="Middlewares\RemoteAccessErrorMiddleware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -66,16 +69,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Responses\ErrorDigestRssHandler.cs" />
-    <Compile Include="Responses\ErrorLogCssHandler.cs" />
-    <Compile Include="Responses\ErrorLogDownloadHandler.cs" />
-    <Compile Include="Responses\ErrorRssHandler.cs" />
-    <Compile Include="Responses\IRequestHandler.cs" />
-    <Compile Include="Responses\Views\Components\SpeedBarComponent.cs" />
-    <Compile Include="Responses\Views\ErrorDetailView.cs" />
-    <Compile Include="Responses\Views\ErrorLogView.cs" />
-    <Compile Include="Responses\Views\ErrorViewBase.cs" />
-    <Compile Include="Responses\Views\NotFoundErrorView.cs" />
+    <Compile Include="Components\SpeedBarComponent.cs" />
+    <Compile Include="Middlewares\ErrorDetailViewMiddleware.cs" />
+    <Compile Include="Middlewares\ErrorLogViewMiddleware.cs" />
+    <Compile Include="Middlewares\ErrorViewBaseMiddleware.cs" />
     <Compile Include="Utilities\HttpCodeParser.cs" />
     <Compile Include="Utilities\SettingsUtility.cs" />
     <Compile Include="Utilities\XmlWriterExtensions.cs" />
@@ -90,7 +87,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Responses\Views\ErrorLogStyle.css" />
+    <Content Include="Stylesheets\ErrorLogStyle.css" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -98,6 +95,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

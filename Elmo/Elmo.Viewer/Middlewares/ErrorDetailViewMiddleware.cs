@@ -3,15 +3,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using Elmo.Logging;
-using Elmo.Viewer.Responses.Views.Components;
+using Elmo.Viewer.Components;
 using Elmo.Viewer.Utilities;
 using Microsoft.Owin;
 
-namespace Elmo.Viewer.Responses.Views
+namespace Elmo.Viewer.Middlewares
 {
-    internal class ErrorDetailView : ErrorViewBase
+    internal class ErrorDetailViewMiddleware : ErrorViewBaseMiddleware
     {
         private ErrorLogEntry errorLogEntry;
+        private string requestQuery;
+
+        public ErrorDetailViewMiddleware(OwinMiddleware next, ElmoViewerOptions options, IErrorLog errorLog)
+            : base(next, options, errorLog) { }
+
+        protected override string SubPath => "/detail";
 
         protected override async Task RenderContentsAsync(XmlWriter writer)
         {
@@ -94,7 +100,7 @@ namespace Elmo.Viewer.Responses.Views
                     await writer.WriteStringAsync("Raw/Source data in ");
 
                     await writer.WriteStartElementAsync("a");
-                    await writer.WriteAttributeStringAsync("href", "json" + OwinContext.Request.Uri.Query);
+                    await writer.WriteAttributeStringAsync("href", "json" + requestQuery);
                     await writer.WriteAttributeStringAsync("rel", "alternate");
                     await writer.WriteAttributeStringAsync("type", "application/json");
                     {
@@ -182,24 +188,19 @@ namespace Elmo.Viewer.Responses.Views
             await writer.WriteElementStringAsync("br", string.Empty);
         }
 
-        protected override async Task LoadContentsAsync()
+        protected override async Task LoadContentsAsync(IOwinContext context)
         {
-            var errorId = OwinContext.Request.Query["id"];
-
+            var errorId = context.Request.Query["id"];
+            
             errorLogEntry = await ErrorLog.GetErrorAsync(errorId);
             if (errorLogEntry == null)
+            {
+                PageTitle = "Error not found in log";
                 return;
+            }
 
             PageTitle = $"Error: {errorLogEntry.Error.TypeName} [{errorLogEntry.Id}]";
-        }
-
-        public override bool CanProcess(string path)
-        {
-            return path.StartsWith("/detail");
-        }
-
-        public ErrorDetailView(PathString rootPath) : base(rootPath)
-        {
+            requestQuery = context.Request.Uri.Query;
         }
     }
 }

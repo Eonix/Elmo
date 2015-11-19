@@ -9,9 +9,9 @@ namespace Elmo.Viewer.Middlewares
 {
     internal class RemoteAccessErrorMiddleware : OwinMiddleware
     {
-        private readonly ElmoOptions options;
+        private readonly ElmoViewerOptions options;
 
-        public RemoteAccessErrorMiddleware(OwinMiddleware next, ElmoOptions options)
+        public RemoteAccessErrorMiddleware(OwinMiddleware next, ElmoViewerOptions options)
             : base(next)
         {
             this.options = options;
@@ -19,11 +19,7 @@ namespace Elmo.Viewer.Middlewares
 
         public override async Task Invoke(IOwinContext context)
         {
-            if (!options.Path.HasValue && !context.Request.Path.StartsWithSegments(options.Path))
-            {
-                await Next.Invoke(context);
-            }
-            else if (IsLocalIpAddress(context) || (options.AllowRemoteAccess && IsAuthenticated(context.Authentication)))
+            if (IsLocalIpAddress(context) || (options.AllowRemoteAccess && IsAuthenticated(context.Authentication)))
             {
                 await Next.Invoke(context);
             }

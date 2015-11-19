@@ -4,13 +4,14 @@ using System.Globalization;
 using System.Threading.Tasks;
 using System.Xml;
 using Elmo.Logging;
-using Elmo.Viewer.Responses.Views.Components;
+using Elmo.Utilities;
+using Elmo.Viewer.Components;
 using Elmo.Viewer.Utilities;
 using Microsoft.Owin;
 
-namespace Elmo.Viewer.Responses.Views
+namespace Elmo.Viewer.Middlewares
 {
-    internal class ErrorLogView : ErrorViewBase
+    internal class ErrorLogViewMiddleware : ErrorViewBaseMiddleware
     {
         private IList<ErrorLogEntry> errorLogEntries;
         private int pageIndex;
@@ -19,7 +20,12 @@ namespace Elmo.Viewer.Responses.Views
 
         private const int DefaultPageSize = 15;
         private const int MaximumPageSize = 100;
-        
+
+        public ErrorLogViewMiddleware(OwinMiddleware next, ElmoViewerOptions options, IErrorLog errorLog)
+            : base(next, options, errorLog) { }
+
+        protected override string SubPath => string.Empty;
+
         protected override async Task RenderContentsAsync(XmlWriter writer)
         {
             await RenderTitleAsync(writer);
@@ -34,45 +40,36 @@ namespace Elmo.Viewer.Responses.Views
             }
             else
             {
-                //
                 // Write error number range displayed on this page and the
                 // total available in the log, followed by stock
                 // page sizes.
-                //
-
-                await writer.WriteStartElementAsync(null, "p", null);
+                await writer.WriteStartElementAsync("p");
 
                 await RenderStatsAsync(writer);
                 await RenderStockPageSizesAsync(writer);
 
                 await writer.WriteEndElementAsync(); // </p>
 
-                //
                 // Write out the main table to display the errors.
-                //
-
                 await RenderErrorsAsync(writer);
 
-                //
                 // Write out page navigation links.
-                //
-
                 await RenderPageNavigatorsAsync(writer);
             }
         }
 
         private async Task RenderPageNavigatorsAsync(XmlWriter writer)
         {
-            await writer.WriteStartElementAsync(null, "p", null);
+            await writer.WriteStartElementAsync("p");
             {
                 var nextPageIndex = pageIndex + 1;
                 var moreErrors = nextPageIndex*pageSize < totalCount;
 
                 if (moreErrors)
                 {
-                    await writer.WriteStartElementAsync(null, "a", null);
-                    await writer.WriteAttributeStringAsync(null, "href", null, $"{BasePageName}?page={nextPageIndex + 1}&size={pageSize}");
-                    await writer.WriteAttributeStringAsync(null, "rel", null, "next");
+                    await writer.WriteStartElementAsync("a");
+                    await writer.WriteAttributeStringAsync("href", $"{BasePageName}?page={nextPageIndex + 1}&size={pageSize}");
+                    await writer.WriteAttributeStringAsync("rel", "next");
                     {
                         await writer.WriteStringAsync("Next errors");
                     }
@@ -86,9 +83,9 @@ namespace Elmo.Viewer.Responses.Views
                     if (moreErrors)
                         await writer.WriteRawAsync("; ");
 
-                    await writer.WriteStartElementAsync(null, "a", null);
-                    await writer.WriteAttributeStringAsync(null, "href", null, $"{BasePageName}?page=1&size={pageSize}");
-                    await writer.WriteAttributeStringAsync(null, "rel", null, "start");
+                    await writer.WriteStartElementAsync("a");
+                    await writer.WriteAttributeStringAsync("href", $"{BasePageName}?page=1&size={pageSize}");
+                    await writer.WriteAttributeStringAsync("rel", "start");
                     {
                         await writer.WriteStringAsync("Back to first page");
                     }
@@ -104,16 +101,16 @@ namespace Elmo.Viewer.Responses.Views
             // Create a table to display error information in each row.
             //
 
-            await writer.WriteStartElementAsync(null, "table", null);
-            await writer.WriteAttributeStringAsync(null, "id", null, "ErrorLog");
-            await writer.WriteAttributeStringAsync(null, "style", null, "border-spacing: 0;");
+            await writer.WriteStartElementAsync("table");
+            await writer.WriteAttributeStringAsync("id", "ErrorLog");
+            await writer.WriteAttributeStringAsync("style", "border-spacing: 0;");
             {
 
                 //
                 // Create the table row for headings.
                 //
 
-                await writer.WriteStartElementAsync(null, "tr", null);
+                await writer.WriteStartElementAsync("tr");
                 {
                     await RenderCellAsync(writer, "th", "Host", "host-col");
                     await RenderCellAsync(writer, "th", "Code", "code-col");
@@ -133,8 +130,8 @@ namespace Elmo.Viewer.Responses.Views
                 {
                     var errorLogEntry = errorLogEntries[index];
 
-                    await writer.WriteStartElementAsync(null, "tr", null);
-                    await writer.WriteAttributeStringAsync(null, "class", null, index % 2 == 0 ? "even-row" : "odd-row");
+                    await writer.WriteStartElementAsync("tr");
+                    await writer.WriteAttributeStringAsync("class", index % 2 == 0 ? "even-row" : "odd-row");
                     {
                         // Format host and status code cells.
 
@@ -150,17 +147,17 @@ namespace Elmo.Viewer.Responses.Views
                         // all error details can be viewed.
                         //
 
-                        await writer.WriteStartElementAsync(null, "td", null);
-                        await writer.WriteAttributeStringAsync(null, "class", null, "error-col");
+                        await writer.WriteStartElementAsync("td");
+                        await writer.WriteAttributeStringAsync("class", "error-col");
                         {
-                            await writer.WriteStartElementAsync(null, "label", null);
+                            await writer.WriteStartElementAsync("label");
                             {
                                 await writer.WriteStringAsync(error.Message);
                             }
                             await writer.WriteEndElementAsync();
 
-                            await writer.WriteStartElementAsync(null, "a", null);
-                            await writer.WriteAttributeStringAsync(null, "href", null, $"{BasePageName}/detail?id={errorLogEntry.Id}");
+                            await writer.WriteStartElementAsync("a");
+                            await writer.WriteAttributeStringAsync("href", $"{BasePageName}/detail?id={errorLogEntry.Id}");
                             {
                                 await writer.WriteRawAsync("Details&hellip;");
                             }
@@ -188,10 +185,10 @@ namespace Elmo.Viewer.Responses.Views
             return fullName;
         }
 
-        private async Task RenderCellAsync(XmlWriter writer, string cellType, string contents, string cssClassName, string tooltip = "")
+        private static async Task RenderCellAsync(XmlWriter writer, string cellType, string contents, string cssClassName, string tooltip = "")
         {
-            await writer.WriteStartElementAsync(null, cellType, null);
-            await writer.WriteAttributeStringAsync(null, "class", null, cssClassName);
+            await writer.WriteStartElementAsync(cellType);
+            await writer.WriteAttributeStringAsync("class", cssClassName);
 
             if (string.IsNullOrEmpty(contents?.Trim()))
             {
@@ -205,8 +202,8 @@ namespace Elmo.Viewer.Responses.Views
                 }
                 else
                 {
-                    await writer.WriteStartElementAsync(null, "label", null);
-                    await writer.WriteAttributeStringAsync(null, "title", null, tooltip);
+                    await writer.WriteStartElementAsync("label");
+                    await writer.WriteAttributeStringAsync("title", tooltip);
                     await writer.WriteStringAsync(contents);
                     await writer.WriteEndElementAsync();
                 }
@@ -245,9 +242,9 @@ namespace Elmo.Viewer.Responses.Views
 
                 var href = $"{BasePageName}?page=1&size={stockSize}";
 
-                await writer.WriteStartElementAsync(null, "a", null);
-                await writer.WriteAttributeStringAsync(null, "href", null, href);
-                await writer.WriteAttributeStringAsync(null, "rel", null, "start");
+                await writer.WriteStartElementAsync("a");
+                await writer.WriteAttributeStringAsync("href", href);
+                await writer.WriteAttributeStringAsync("rel", "start");
 
                 await writer.WriteStringAsync(stockSize.ToString());
                 await writer.WriteEndElementAsync();
@@ -258,7 +255,7 @@ namespace Elmo.Viewer.Responses.Views
 
         private async Task RenderNoErrorsAsync(XmlWriter writer)
         {
-            await writer.WriteStartElementAsync(null, "p", null);
+            await writer.WriteStartElementAsync("p");
 
             await writer.WriteStringAsync("No errors found. ");
 
@@ -272,9 +269,9 @@ namespace Elmo.Viewer.Responses.Views
             {
                 var href = $"{BasePageName}?page=1&size={pageSize}";
 
-                await writer.WriteStartElementAsync(null, "a", null);
-                await writer.WriteAttributeStringAsync(null, "href", null, href);
-                await writer.WriteAttributeStringAsync(null, "rel", null, "start");
+                await writer.WriteStartElementAsync("a");
+                await writer.WriteAttributeStringAsync("href", href);
+                await writer.WriteAttributeStringAsync("rel", "start");
 
                 await writer.WriteStringAsync("Go to first page");
                 await writer.WriteEndElementAsync();
@@ -287,16 +284,16 @@ namespace Elmo.Viewer.Responses.Views
 
         private async Task RenderTitleAsync(XmlWriter writer)
         {
-            await writer.WriteStartElementAsync(null, "h1", null);
-            await writer.WriteAttributeStringAsync(null, "id", null, "PageTitle");
+            await writer.WriteStartElementAsync("h1");
+            await writer.WriteAttributeStringAsync("id", "PageTitle");
             await writer.WriteStringAsync("Error Log for ");
 
-            await writer.WriteStartElementAsync(null, "span", null);
-            await writer.WriteAttributeStringAsync(null, "id", null, "ApplicationName");
-            await writer.WriteAttributeStringAsync(null, "title", null, ApplicationName);
+            await writer.WriteStartElementAsync("span");
+            await writer.WriteAttributeStringAsync("id", "ApplicationName");
+            await writer.WriteAttributeStringAsync("title", ApplicationName);
             await writer.WriteStringAsync(ApplicationName);
 
-            var machineName = GetMachineName();
+            var machineName = EnvironmentUtilities.GetMachineNameOrDefault();
             if (!string.IsNullOrEmpty(machineName?.Trim()))
             {
                 await writer.WriteStringAsync(" on ");
@@ -308,16 +305,16 @@ namespace Elmo.Viewer.Responses.Views
             await writer.WriteEndElementAsync(); // </h1>
         }
 
-        protected override async Task LoadContentsAsync()
+        protected override async Task LoadContentsAsync(IOwinContext context)
         {
             // Get the page index and size parameters within their bounds.
-            pageSize = Convert.ToInt32(OwinContext.Request.Query["size"], CultureInfo.InvariantCulture);
+            pageSize = Convert.ToInt32(context.Request.Query["size"], CultureInfo.InvariantCulture);
             pageSize = Math.Min(MaximumPageSize, Math.Max(0, pageSize));
 
             if (pageSize == 0)
                 pageSize = DefaultPageSize;
 
-            pageIndex = Convert.ToInt32(OwinContext.Request.Query["page"], CultureInfo.InvariantCulture);
+            pageIndex = Convert.ToInt32(context.Request.Query["page"], CultureInfo.InvariantCulture);
             pageIndex = Math.Max(1, pageIndex) - 1;
 
             // Read the error records.
@@ -325,31 +322,11 @@ namespace Elmo.Viewer.Responses.Views
             totalCount = ErrorLog.GetTotalErrorCount();
 
             // Set the title of the page.
-            var hostName = GetMachineName();
+            var hostName = EnvironmentUtilities.GetMachineNameOrDefault();
             PageTitle = hostName.Length > 0
                 ? $"Error log for {ApplicationName} on {hostName} (Page #{(pageIndex + 1).ToString("N0")})"
                 : $"Error log for {ApplicationName} (Page #{(pageIndex + 1).ToString("N0")})";
         }
-
-        public override bool CanProcess(string path)
-        {
-            return string.IsNullOrWhiteSpace(path);
-        }
-
-        private static string GetMachineName()
-        {
-            try
-            {
-                return Environment.MachineName;
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
-        }
-
-        public ErrorLogView(PathString rootPath) : base(rootPath)
-        {
-        }
+        
     }
 }
