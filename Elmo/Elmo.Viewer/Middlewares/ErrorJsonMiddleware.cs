@@ -9,25 +9,15 @@ namespace Elmo.Viewer.Middlewares
 {
     internal class ErrorJsonMiddleware : OwinMiddleware
     {
-        private readonly ElmoViewerOptions options;
         private readonly IErrorLog errorLog;
 
-        public ErrorJsonMiddleware(OwinMiddleware next, ElmoViewerOptions options, IErrorLog errorLog) : base(next)
+        public ErrorJsonMiddleware(OwinMiddleware next, IErrorLog errorLog) : base(next)
         {
-            this.options = options;
             this.errorLog = errorLog;
         }
 
         public override async Task Invoke(IOwinContext context)
         {
-            PathString subPath;
-            context.Request.Path.StartsWithSegments(options.Path, out subPath);
-            if (!subPath.StartsWithSegments(new PathString("/json")))
-            {
-                await Next.Invoke(context);
-                return;
-            }
-
             context.Response.ContentType = "application/json";
 
             var errorId = context.Request.Query["id"];

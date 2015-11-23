@@ -9,25 +9,15 @@ namespace Elmo.Viewer.Middlewares
 {
     internal class ErrorLogDownloadMiddleware : OwinMiddleware
     {
-        private readonly ElmoViewerOptions options;
         private readonly IErrorLog errorLog;
 
-        public ErrorLogDownloadMiddleware(OwinMiddleware next, ElmoViewerOptions options, IErrorLog errorLog) : base(next)
+        public ErrorLogDownloadMiddleware(OwinMiddleware next, IErrorLog errorLog) : base(next)
         {
-            this.options = options;
             this.errorLog = errorLog;
         }
 
         public override async Task Invoke(IOwinContext context)
         {
-            PathString subPath;
-            context.Request.Path.StartsWithSegments(options.Path, out subPath);
-            if (!subPath.StartsWithSegments(new PathString("/download")))
-            {
-                await Next.Invoke(context);
-                return;
-            }
-
             const int defaultPageSize = 100;
             var pageIndex = 0;
             var count = 0;

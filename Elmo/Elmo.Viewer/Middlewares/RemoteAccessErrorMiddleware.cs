@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Elmo.Viewer.Utilities;
@@ -65,7 +66,11 @@ namespace Elmo.Viewer.Middlewares
 
         private static bool IsLocalIpAddress(IOwinContext owinContext)
         {
-            return owinContext.Get<bool>("server.IsLocal");
+            //if (owinContext.Environment.ContainsKey("server.IsLocal"))
+            //    return owinContext.Get<bool>("server.IsLocal");
+
+            var hostname = owinContext.Request.Uri.Host;
+            return hostname == "127.0.0.1" || hostname == "::1" || hostname == "localhost";
         }
     }
 }

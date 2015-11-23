@@ -12,25 +12,15 @@ namespace Elmo.Viewer.Middlewares
 {
     internal class ErrorRssMiddleware : OwinMiddleware
     {
-        private readonly ElmoViewerOptions options;
         private readonly IErrorLog errorLog;
 
-        public ErrorRssMiddleware(OwinMiddleware next, ElmoViewerOptions options, IErrorLog errorLog) : base(next)
+        public ErrorRssMiddleware(OwinMiddleware next, IErrorLog errorLog) : base(next)
         {
-            this.options = options;
             this.errorLog = errorLog;
         }
 
         public override async Task Invoke(IOwinContext context)
         {
-            PathString subPath;
-            context.Request.Path.StartsWithSegments(options.Path, out subPath);
-            if (!subPath.StartsWithSegments(new PathString("/rss")))
-            {
-                await Next.Invoke(context);
-                return;
-            }
-
             const int pageSize = 15;
             var errorLogEntries = await errorLog.GetErrorsAsync(0, pageSize);
 

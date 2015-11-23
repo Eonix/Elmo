@@ -16,8 +16,6 @@ namespace Elmo.Viewer.Middlewares
         protected string BasePageName => Options.Path.Value;
         protected string ApplicationName => ErrorLog.ApplicationName;
 
-        protected abstract string SubPath { get; }
-
         protected ErrorViewBaseMiddleware(OwinMiddleware next, ElmoViewerOptions options, IErrorLog errorLog) : base(next)
         {
             Options = options;
@@ -26,14 +24,6 @@ namespace Elmo.Viewer.Middlewares
 
         public override async Task Invoke(IOwinContext context)
         {
-            PathString subPath;
-            context.Request.Path.StartsWithSegments(Options.Path, out subPath);
-            if (subPath.Value.TrimEnd('/') != SubPath)
-            {
-                await Next.Invoke(context);
-                return;
-            }
-            
             await RenderAsync(context);
         }
 

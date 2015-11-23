@@ -14,25 +14,15 @@ namespace Elmo.Viewer.Middlewares
 {
     internal class ErrorDigestRssMiddleware : OwinMiddleware
     {
-        private readonly ElmoViewerOptions options;
         private readonly IErrorLog errorLog;
 
-        public ErrorDigestRssMiddleware(OwinMiddleware next, ElmoViewerOptions options, IErrorLog errorLog) : base(next)
+        public ErrorDigestRssMiddleware(OwinMiddleware next, IErrorLog errorLog) : base(next)
         {
-            this.options = options;
             this.errorLog = errorLog;
         }
 
         public override async Task Invoke(IOwinContext context)
         {
-            PathString subPath;
-            context.Request.Path.StartsWithSegments(options.Path, out subPath);
-            if (!subPath.StartsWithSegments(new PathString("/digestrss")))
-            {
-                await Next.Invoke(context);
-                return;
-            }
-
             var syndicationFeed = new SyndicationFeed();
 
             var hostName = EnvironmentUtilities.GetMachineNameOrDefault("Unknown Host");
