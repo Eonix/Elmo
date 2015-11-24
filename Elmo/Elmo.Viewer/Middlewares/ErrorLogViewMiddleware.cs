@@ -24,8 +24,6 @@ namespace Elmo.Viewer.Middlewares
         public ErrorLogViewMiddleware(OwinMiddleware next, ElmoViewerOptions options, IErrorLog errorLog)
             : base(next, options, errorLog) { }
 
-        protected override string SubPath => string.Empty;
-
         protected override async Task RenderContentsAsync(XmlWriter writer)
         {
             await RenderTitleAsync(writer);

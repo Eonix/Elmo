@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Elmo.Logging;
 using Elmo.Viewer.Middlewares;
 using Microsoft.Owin;
@@ -26,21 +27,27 @@ namespace Elmo.Viewer
             if (options.Path == null || !options.Path.HasValue)
                 throw new InvalidOperationException("Can't use the Elmo Viewer without a root path.");
 
-            return app.MapWhen(context => context.Request.Path.StartsWithSegments(options.Path), builder => Configuration(builder, options));
+            return app.Map(options.Path, builder => Configuration(builder, options));
         }
 
         private static void Configuration(IAppBuilder appBuilder, ElmoViewerOptions options)
         {
             var errorLog = (IErrorLog) appBuilder.Properties[ElmoConstants.ErrorLogPropertyKey];
             appBuilder.Use<RemoteAccessErrorMiddleware>(options);
-            appBuilder.Use<ErrorJsonMiddleware>(options, errorLog);
-            appBuilder.Use<ErrorRssMiddleware>(options, errorLog);
-            appBuilder.Use<ErrorDigestRssMiddleware>(options, errorLog);
-            appBuilder.Use<ErrorLogDownloadMiddleware>(options, errorLog);
-            appBuilder.Use<ErrorLogCssMiddleware>(options);
-            appBuilder.Use<ErrorDetailViewMiddleware>(options, errorLog);
-            appBuilder.Use<ErrorLogViewMiddleware>(options, errorLog);
+            appBuilder.Map("/test", app => app.Run(TestHandler));
+            appBuilder.Map("/json", app => app.Use<ErrorJsonMiddleware>(errorLog));
+            appBuilder.Map("/rss", app => app.Use<ErrorRssMiddleware>(errorLog));
+            appBuilder.Map("/digestrss", app => app.Use<ErrorDigestRssMiddleware>(errorLog));
+            appBuilder.Map("/download", app => app.Use<ErrorLogDownloadMiddleware>(errorLog));
+            appBuilder.Map("/stylesheet", app => app.Use<ErrorLogCssMiddleware>());
+            appBuilder.Map("/detail", app => app.Use<ErrorDetailViewMiddleware>(options, errorLog));
+            appBuilder.MapWhen(context => string.IsNullOrWhiteSpace(context.Request.Path.Value.Trim('/')), app => app.Use<ErrorLogViewMiddleware>(options, errorLog));
             appBuilder.Use<NotFoundErrorMiddleware>();
+        }
+
+        private static Task TestHandler(IOwinContext owinContext)
+        {
+            throw new Exception();
         }
     }
 }

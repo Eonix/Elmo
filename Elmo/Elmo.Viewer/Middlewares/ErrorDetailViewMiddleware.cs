@@ -17,8 +17,6 @@ namespace Elmo.Viewer.Middlewares
         public ErrorDetailViewMiddleware(OwinMiddleware next, ElmoViewerOptions options, IErrorLog errorLog)
             : base(next, options, errorLog) { }
 
-        protected override string SubPath => "/detail";
-
         protected override async Task RenderContentsAsync(XmlWriter writer)
         {
             if (errorLogEntry != null)
